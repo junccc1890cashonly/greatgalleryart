@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GalleryArt - Gallery</title>
+    <style>
+      :root {
+        --line: rgba(44, 39, 34, 0.12);
+        --text: #1d1a17;
+        --muted: #72695f;
+        --soft: #a79c90;
+        --accent: #556b5f;
+        --accent-soft: rgba(85, 107, 95, 0.14);
+        --shadow: 0 24px 60px rgba(37, 30, 24, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 30%),
+          linear-gradient(180deg, #f8f3ed 0%, #f2ece3 100%);
+      }
+      .page {
+        width: min(1460px, calc(100vw - 44px));
+        margin: 22px auto;
+        padding: 28px;
+        border: 1px solid var(--line);
+        background: rgba(255, 251, 245, 0.58);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+      .topbar,
+      .toolbar,
+      .footer-note {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+      }
+      .topbar {
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.55);
+      }
+      .brand-copy h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 400;
+      }
+      .brand-copy p,
+      .nav,
+      .meta,
+      .footer-note,
+      .copy,
+      .action {
+        color: var(--muted);
+      }
+      .brand-copy p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 14px;
+      }
+      .nav a,
+      .action {
+        color: inherit;
+        text-decoration: none;
+      }
+      .nav .current {
+        color: var(--text);
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 24px;
+        padding: 34px 0 24px;
+      }
+      .eyebrow,
+      .tiny,
+      .tag,
+      .meta {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        color: var(--accent);
+        border: 1px solid rgba(85, 107, 95, 0.16);
+        background: var(--accent-soft);
+      }
+      .hero-copy h2 {
+        margin: 0 0 14px;
+        font-size: clamp(36px, 5vw, 62px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+      .hero-copy p {
+        margin: 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.9;
+      }
+      .hero-panel,
+      .toolbar,
+      .sidebar-block,
+      .gallery-item,
+      .stat-card {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+      .hero-panel {
+        padding: 18px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .stat-card {
+        padding: 16px;
+      }
+      .stat-card strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 28px;
+        font-weight: 400;
+      }
+      .tiny { color: var(--soft); }
+      .toolbar {
+        padding: 16px;
+        margin: 8px 0 24px;
+        flex-wrap: wrap;
+      }
+      .toolbar-left,
+      .toolbar-right,
+      .filters,
+      .meta,
+      .item-tags {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .search,
+      .pill,
+      .action,
+      .tag {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.54);
+      }
+      .search {
+        min-width: 250px;
+        padding: 12px 14px;
+        font-size: 14px;
+      }
+      .pill,
+      .action,
+      .tag {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .pill.active,
+      .action.primary {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-color: rgba(85, 107, 95, 0.16);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 20px;
+      }
+      .sidebar {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+      }
+      .sidebar-block {
+        padding: 18px;
+      }
+      .sidebar-block h3 {
+        margin: 0 0 14px;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .sidebar-list {
+        display: grid;
+        gap: 10px;
+      }
+      .sidebar-list a {
+        display: block;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(44, 39, 34, 0.08);
+      }
+      .sidebar-list a:last-child {
+        border-bottom: none;
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+      .gallery-item {
+        padding: 14px;
+      }
+      .gallery-cover {
+        aspect-ratio: 0.82;
+        border: 1px solid var(--line);
+        background-size: cover;
+        background-position: center;
+      }
+      .cover-1 { background-image: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"); }
+      .cover-2 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
+      .cover-3 { background-image: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80"); }
+      .cover-4 { background-image: url("https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=900&q=80"); }
+      .cover-5 { background-image: url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80"); }
+      .cover-6 { background-image: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"); }
+      .gallery-item h4 {
+        margin: 14px 0 6px;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .gallery-item p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+      .tag {
+        color: var(--muted);
+      }
+      .footer-note {
+        margin-top: 28px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      @media (max-width: 1120px) {
+        .hero,
+        .layout,
+        .gallery-grid,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .page {
+          width: min(100vw - 20px, 1460px);
+          margin: 10px auto;
+          padding: 18px;
+        }
+        .topbar,
+        .toolbar,
+        .footer-note {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .search {
+          min-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">GA</div>
+          <div class="brand-copy">
+            <h1>GalleryArt</h1>
+            <p>Structured Inspiration, Quietly Curated</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <a href="/Users/junc/Documents/galleryArt/index.html">Home</a>
+          <a class="current" href="/Users/junc/Documents/galleryArt/gallery.html">Gallery</a>
+          <a href="/Users/junc/Documents/galleryArt/collection.html">Collections</a>
+          <a href="/Users/junc/Documents/galleryArt/prompt-studio.html">Prompt Studio</a>
+        </nav>
+      </header>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Curated Reference Library</div>
+          <h2>不是把图片堆在一起，而是把审美偏好整理成可检索的视觉档案。</h2>
+          <p>这一页偏重浏览和筛选体验。结构上保持干净的网格、克制的信息密度和充足留白，让图片本身成为主角，同时保留标签、主题和集合入口，方便后续进入 Prompt Studio。</p>
+        </div>
+        <aside class="hero-panel">
+          <div class="tiny">Current Mood</div>
+          <div class="stats">
+            <div class="stat-card"><div class="tiny">Saved Photos</div><strong>128</strong></div>
+            <div class="stat-card"><div class="tiny">Collections</div><strong>09</strong></div>
+            <div class="stat-card"><div class="tiny">Prompt Sets</div><strong>34</strong></div>
+          </div>
+        </aside>
+      </section>
+      <section class="toolbar">
+        <div class="toolbar-left">
+          <div class="search">Search by theme, hashtag, note...</div>
+          <div class="filters">
+            <span class="pill active">All</span>
+            <span class="pill">Editorial</span>
+            <span class="pill">Interior</span>
+            <span class="pill">Portrait</span>
+            <span class="pill">Neutral Palette</span>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <span class="action">Latest</span>
+          <span class="action">Multi Select</span>
+          <a class="action primary" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Generate Prompt</a>
+        </div>
+      </section>
+      <section class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-block">
+            <h3>Collections</h3>
+            <div class="sidebar-list">
+              <a href="/Users/junc/Documents/galleryArt/collection.html">Quiet Luxury</a>
+              <a href="/Users/junc/Documents/galleryArt/collection.html">Soft Portrait Notes</a>
+              <a href="/Users/junc/Documents/galleryArt/collection.html">Interior Silence</a>
+              <a href="/Users/junc/Documents/galleryArt/collection.html">Muted Objects</a>
+            </div>
+          </div>
+          <div class="sidebar-block">
+            <h3>Suggested Tags</h3>
+            <div class="item-tags">
+              <span class="tag">#editorial</span>
+              <span class="tag">#quietluxury</span>
+              <span class="tag">#softdaylight</span>
+              <span class="tag">#negative-space</span>
+              <span class="tag">#neutral</span>
+            </div>
+          </div>
+          <div class="sidebar-block">
+            <h3>Current Selection</h3>
+            <p class="copy">6 images selected for the next prompt study</p>
+            <a class="action primary" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Open Prompt Studio</a>
+          </div>
+        </aside>
+        <div class="gallery-grid">
+          <article class="gallery-item">
+            <div class="gallery-cover cover-1"></div>
+            <h4>Quiet Figure</h4>
+            <p>柔和人物姿态与较大的呼吸区，适合提炼 editorial 人像方向。</p>
+            <div class="meta">Added Apr 19 · Collection Quiet Luxury</div>
+            <div class="item-tags"><span class="tag">#portrait</span><span class="tag">#softlight</span></div>
+          </article>
+          <article class="gallery-item">
+            <div class="gallery-cover cover-2"></div>
+            <h4>Textural Living</h4>
+            <p>带材质层次的室内生活图像，适合生成空间与品牌氛围 prompt。</p>
+            <div class="meta">Added Apr 17 · Collection Interior Silence</div>
+            <div class="item-tags"><span class="tag">#interior</span><span class="tag">#neutral</span></div>
+          </article>
+          <article class="gallery-item">
+            <div class="gallery-cover cover-3"></div>
+            <h4>Curated Room</h4>
+            <p>安静、克制、结构感强的空间构图，强调留白与柔和质地。</p>
+            <div class="meta">Added Apr 15 · Collection Interior Silence</div>
+            <div class="item-tags"><span class="tag">#space</span><span class="tag">#negative-space</span></div>
+          </article>
+          <article class="gallery-item">
+            <div class="gallery-cover cover-4"></div>
+            <h4>Soft Portrait Notes</h4>
+            <p>轻柔色阶与时尚感人物构图，适合人像类 prompt 的审美参考。</p>
+            <div class="meta">Added Apr 12 · Collection Soft Portrait Notes</div>
+            <div class="item-tags"><span class="tag">#editorial</span><span class="tag">#fashion</span></div>
+          </article>
+          <article class="gallery-item">
+            <div class="gallery-cover cover-5"></div>
+            <h4>Slow Detail</h4>
+            <p>偏生活化的特写与局部构图，适合更安静的品牌内容表达。</p>
+            <div class="meta">Added Apr 11 · Collection Muted Objects</div>
+            <div class="item-tags"><span class="tag">#detail</span><span class="tag">#warm-neutral</span></div>
+          </article>
+          <article class="gallery-item">
+            <div class="gallery-cover cover-6"></div>
+            <h4>Quiet Window Light</h4>
+            <p>以光感和留白为主的画面，适合生成 calm atmosphere 方向的 prompt。</p>
+            <div class="meta">Added Apr 08 · Collection Quiet Luxury</div>
+            <div class="item-tags"><span class="tag">#light</span><span class="tag">#calm</span></div>
+          </article>
+        </div>
+      </section>
+      <footer class="footer-note">
+        <span>Static gallery concept</span>
+        <span>Clean grid, low contrast controls, whitespace first</span>
+      </footer>
+    </main>
+  </body>
+</html>

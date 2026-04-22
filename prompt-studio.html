@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GalleryArt - Prompt Studio</title>
+    <style>
+      :root {
+        --line: rgba(44, 39, 34, 0.12);
+        --text: #1d1a17;
+        --muted: #72695f;
+        --soft: #a79c90;
+        --accent: #556b5f;
+        --accent-soft: rgba(85, 107, 95, 0.14);
+        --shadow: 0 24px 60px rgba(37, 30, 24, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 30%),
+          linear-gradient(180deg, #f8f3ed 0%, #f2ece3 100%);
+      }
+      .page {
+        width: min(1460px, calc(100vw - 44px));
+        margin: 22px auto;
+        padding: 28px;
+        border: 1px solid var(--line);
+        background: rgba(255, 251, 245, 0.58);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+      .topbar,
+      .hero,
+      .footer-note {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+      .topbar {
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.55);
+      }
+      .brand-copy h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 400;
+      }
+      .brand-copy p,
+      .nav,
+      .footer-note,
+      .subtle {
+        color: var(--muted);
+      }
+      .brand-copy p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 14px;
+      }
+      .nav a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .nav .current { color: var(--text); }
+      .hero {
+        align-items: end;
+        padding: 34px 0 26px;
+      }
+      .eyebrow,
+      .label,
+      .tag {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        color: var(--accent);
+        border: 1px solid rgba(85, 107, 95, 0.16);
+        background: var(--accent-soft);
+      }
+      .hero-copy h2 {
+        margin: 0 0 14px;
+        font-size: clamp(38px, 5vw, 64px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+      .hero-copy p {
+        max-width: 760px;
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.9;
+        color: var(--muted);
+      }
+      .status-box {
+        min-width: 280px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+      .status-box strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 32px;
+        font-weight: 400;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: 0.88fr 1.12fr;
+        gap: 20px;
+      }
+      .panel,
+      .field,
+      .analysis-card,
+      .prompt-card {
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .panel-head h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .selection-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .selection-card {
+        aspect-ratio: 0.84;
+        border: 1px solid var(--line);
+        background-size: cover;
+        background-position: center;
+      }
+      .ref-1 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
+      .ref-2 { background-image: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"); }
+      .ref-3 { background-image: url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80"); }
+      .ref-4 { background-image: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80"); }
+      .field-stack,
+      .analysis-stack {
+        display: grid;
+        gap: 14px;
+      }
+      .field p,
+      .analysis-card p,
+      .prompt-card p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.85;
+      }
+      .tag-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .tag {
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.48);
+        color: var(--muted);
+      }
+      .prompt-card {
+        min-height: 320px;
+        background: rgba(255, 252, 247, 0.82);
+      }
+      .prompt-card p {
+        font-size: 16px;
+        line-height: 1.95;
+      }
+      .footer-note {
+        margin-top: 26px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      @media (max-width: 1120px) {
+        .hero,
+        .workspace,
+        .tag-row,
+        .footer-note {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .page {
+          width: min(100vw - 20px, 1460px);
+          margin: 10px auto;
+          padding: 18px;
+        }
+        .topbar {
+          display: grid;
+          gap: 14px;
+        }
+        .selection-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">GA</div>
+          <div class="brand-copy">
+            <h1>GalleryArt</h1>
+            <p>Prompt Studio For Lovart</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <a href="/Users/junc/Documents/galleryArt/index.html">Home</a>
+          <a href="/Users/junc/Documents/galleryArt/gallery.html">Gallery</a>
+          <a href="/Users/junc/Documents/galleryArt/collection.html">Collections</a>
+          <a class="current" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Prompt Studio</a>
+        </nav>
+      </header>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Prompt First Creation Flow</div>
+          <h2>从一组参考图里提炼共同气质，再生成可以直接投喂 Lovart 的 prompt。</h2>
+          <p>这一页强调左图右文的工作台关系。视觉上尽量避免代码面板感，而更像一张正在被编辑的创意稿纸，让 AI 输出结果也保持高级、克制、有留白。</p>
+        </div>
+        <aside class="status-box">
+          <div class="label subtle">Selected References</div>
+          <strong>04</strong>
+          <div class="subtle">mode: style fusion</div>
+        </aside>
+      </section>
+      <section class="workspace">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Reference Selection</h3>
+            <span class="subtle">Quiet Luxury / Interior Silence</span>
+          </div>
+          <div class="selection-grid">
+            <div class="selection-card ref-1"></div>
+            <div class="selection-card ref-2"></div>
+            <div class="selection-card ref-3"></div>
+            <div class="selection-card ref-4"></div>
+          </div>
+          <div class="field-stack" style="margin-top: 18px;">
+            <div class="field">
+              <div class="label">Creative Direction</div>
+              <p>希望保留极简、安静、高级的空间氛围，同时让画面更偏现代生活方式品牌的编辑感。</p>
+            </div>
+            <div class="field">
+              <div class="label">Generation Mode</div>
+              <p>Style fusion with restrained palette, negative space, tactile materials, editorial framing.</p>
+            </div>
+          </div>
+        </div>
+        <div class="analysis-stack">
+          <section class="analysis-card">
+            <div class="label">Style Summary</div>
+            <p>整体视觉气质偏安静的高级感，重点不是强烈视觉刺激，而是由柔和光线、低饱和中性色、克制构图和材质细节共同构成的编辑式氛围。画面节奏慢，信息量低，但仍然具有品牌级完成度。</p>
+          </section>
+          <section class="analysis-card">
+            <div class="label">Suggested Hashtags</div>
+            <div class="tag-row">
+              <span class="tag">#quietluxury</span>
+              <span class="tag">#editorialspace</span>
+              <span class="tag">#softdaylight</span>
+              <span class="tag">#neutralpalette</span>
+              <span class="tag">#curatedliving</span>
+              <span class="tag">#negative-space</span>
+            </div>
+          </section>
+          <section class="prompt-card">
+            <div class="label">Lovart Prompt</div>
+            <p>Create a modern editorial lifestyle scene with soft daylight, quiet luxury atmosphere, restrained neutral tones, tactile materials, subtle texture contrasts, and generous negative space. The composition should feel calm, curated, and premium rather than decorative, with elegant framing, understated styling, and a refined visual rhythm suitable for a contemporary design-forward brand campaign.</p>
+          </section>
+        </div>
+      </section>
+      <footer class="footer-note">
+        <span>Static prompt studio concept</span>
+        <span>Image selection on the left, calm editorial output on the right</span>
+      </footer>
+    </main>
+  </body>
+</html>
