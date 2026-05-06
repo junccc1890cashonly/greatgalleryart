@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GalleryArt - Archive</title>
+    <style>
+      :root {
+        --line: rgba(44, 39, 34, 0.12);
+        --text: #1d1a17;
+        --muted: #72695f;
+        --soft: #a79c90;
+        --accent: #556b5f;
+        --accent-soft: rgba(85, 107, 95, 0.14);
+        --shadow: 0 24px 60px rgba(37, 30, 24, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 30%),
+          linear-gradient(180deg, #f8f3ed 0%, #f2ece3 100%);
+      }
+
+      .page {
+        width: min(1460px, calc(100vw - 44px));
+        margin: 22px auto;
+        padding: 28px;
+        border: 1px solid var(--line);
+        background: rgba(255, 251, 245, 0.58);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+
+      .topbar,
+      .toolbar,
+      .footer-note {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .topbar {
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      .brand-copy h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 400;
+      }
+
+      .brand-copy p,
+      .nav,
+      .subtle,
+      .footer-note,
+      .ghost,
+      .entry-copy p,
+      .entry-meta {
+        color: var(--muted);
+      }
+
+      .brand-copy p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 14px;
+      }
+
+      .nav a,
+      .pill,
+      .ghost {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .nav .current {
+        color: var(--text);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 24px;
+        padding: 34px 0 24px;
+      }
+
+      .eyebrow,
+      .tiny,
+      .tag,
+      .entry-meta,
+      .status {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        color: var(--accent);
+        border: 1px solid rgba(85, 107, 95, 0.16);
+        background: var(--accent-soft);
+      }
+
+      .hero-copy h2 {
+        margin: 0 0 14px;
+        font-size: clamp(38px, 5vw, 62px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-copy p {
+        margin: 0;
+        max-width: 740px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.9;
+      }
+
+      .hero-panel,
+      .toolbar,
+      .entry,
+      .insight-card,
+      .stat-card {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+
+      .hero-panel {
+        padding: 18px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat-card {
+        padding: 16px;
+      }
+
+      .stat-card strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 28px;
+        font-weight: 400;
+      }
+
+      .tiny,
+      .subtle {
+        color: var(--soft);
+      }
+
+      .toolbar {
+        padding: 16px;
+        margin: 8px 0 24px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar-left,
+      .toolbar-right,
+      .tag-row,
+      .entry-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .search,
+      .pill,
+      .ghost,
+      .tag {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.54);
+      }
+
+      .search {
+        min-width: 280px;
+        padding: 12px 14px;
+        font-size: 14px;
+      }
+
+      .pill,
+      .ghost,
+      .tag {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+
+      .pill.active {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-color: rgba(85, 107, 95, 0.16);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 20px;
+      }
+
+      .archive-list {
+        display: grid;
+        gap: 18px;
+      }
+
+      .entry {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .entry-visual {
+        aspect-ratio: 0.9;
+        border: 1px solid var(--line);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .visual-1 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
+      .visual-2 { background-image: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"); }
+      .visual-3 { background-image: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80"); }
+
+      .entry-copy h3 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        font-weight: 400;
+      }
+
+      .entry-copy p {
+        margin: 0 0 14px;
+        font-size: 15px;
+        line-height: 1.85;
+      }
+
+      .entry-meta {
+        margin-bottom: 12px;
+      }
+
+      .tag {
+        color: var(--muted);
+      }
+
+      .status {
+        color: var(--accent);
+      }
+
+      .entry-actions {
+        margin-top: 14px;
+      }
+
+      .insights {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+      }
+
+      .insight-card {
+        padding: 18px;
+      }
+
+      .insight-card h3 {
+        margin: 0 0 14px;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .insight-card p,
+      .insight-card li {
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .insight-card ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .footer-note {
+        margin-top: 28px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 1120px) {
+        .hero,
+        .layout,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          width: min(100vw - 20px, 1460px);
+          margin: 10px auto;
+          padding: 18px;
+        }
+
+        .topbar,
+        .toolbar,
+        .footer-note,
+        .entry {
+          flex-direction: column;
+          align-items: flex-start;
+          display: flex;
+        }
+
+        .search {
+          min-width: 100%;
+        }
+
+        .entry-visual {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">GA</div>
+          <div class="brand-copy">
+            <h1>GalleryArt</h1>
+            <p>Archive And Prompt History</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <a href="/Users/junc/Documents/galleryArt/index.html">Home</a>
+          <a href="/Users/junc/Documents/galleryArt/gallery.html">Gallery</a>
+          <a href="/Users/junc/Documents/galleryArt/collection.html">Collections</a>
+          <a href="/Users/junc/Documents/galleryArt/prompt-studio.html">Prompt Studio</a>
+          <a class="current" href="/Users/junc/Documents/galleryArt/archive.html">Archive</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Saved Prompt Assets</div>
+          <h2>把生成过的 prompt 也沉淀成创作资产，而不是一次性的输出结果。</h2>
+          <p>
+            Archive 页展示已经生成过的 prompt、它们关联的图片集合、风格标签和可复用状态。视觉上延续档案式的安静气质，让“历史记录”更像个人审美库，而不是操作日志。
+          </p>
+        </div>
+        <aside class="hero-panel">
+          <div class="tiny">Archive Status</div>
+          <div class="stats">
+            <div class="stat-card">
+              <div class="tiny">Saved Prompts</div>
+              <strong>34</strong>
+            </div>
+            <div class="stat-card">
+              <div class="tiny">Reusable Sets</div>
+              <strong>12</strong>
+            </div>
+            <div class="stat-card">
+              <div class="tiny">Starred</div>
+              <strong>08</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="toolbar">
+        <div class="toolbar-left">
+          <div class="search">Search by collection, prompt text, hashtag...</div>
+          <span class="pill active">All History</span>
+          <span class="pill">Starred</span>
+          <span class="pill">Quiet Luxury</span>
+          <span class="pill">Interior Silence</span>
+        </div>
+        <div class="toolbar-right">
+          <span class="ghost">Latest First</span>
+          <a class="ghost" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Create New Prompt</a>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="archive-list">
+          <article class="entry">
+            <div class="entry-visual visual-1"></div>
+            <div class="entry-copy">
+              <div class="entry-meta">Apr 22 · Quiet Luxury · <span class="status">Starred</span></div>
+              <h3>Calm Editorial Lifestyle Prompt</h3>
+              <p>
+                Create a refined editorial lifestyle scene with soft daylight, restrained neutral tones, tactile materials, and generous negative space. The composition should feel curated, premium, and quietly modern.
+              </p>
+              <div class="tag-row">
+                <span class="tag">#quietluxury</span>
+                <span class="tag">#editorialspace</span>
+                <span class="tag">#softdaylight</span>
+              </div>
+              <div class="entry-actions">
+                <span class="ghost">Reuse Prompt</span>
+                <span class="ghost">View Source Set</span>
+                <span class="ghost">Copy</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="entry">
+            <div class="entry-visual visual-2"></div>
+            <div class="entry-copy">
+              <div class="entry-meta">Apr 19 · Soft Portrait Notes · Saved</div>
+              <h3>Soft Fashion Portrait Direction</h3>
+              <p>
+                Generate an understated fashion portrait with soft diffused light, quiet confidence, muted skin tones, minimal styling, and an intimate editorial crop that feels elegant rather than performative.
+              </p>
+              <div class="tag-row">
+                <span class="tag">#softportrait</span>
+                <span class="tag">#fashioneditorial</span>
+                <span class="tag">#mutedtones</span>
+              </div>
+              <div class="entry-actions">
+                <span class="ghost">Reuse Prompt</span>
+                <span class="ghost">Edit Version</span>
+                <span class="ghost">Copy</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="entry">
+            <div class="entry-visual visual-3"></div>
+            <div class="entry-copy">
+              <div class="entry-meta">Apr 17 · Interior Silence · Saved</div>
+              <h3>Quiet Interior Brand Scene</h3>
+              <p>
+                Build a modern interior composition with calm daylight, warm mineral neutrals, sculptural furniture, subtle material contrast, and museum-like spacing for a contemporary design-forward campaign.
+              </p>
+              <div class="tag-row">
+                <span class="tag">#interiorsilence</span>
+                <span class="tag">#curatedliving</span>
+                <span class="tag">#negativespace</span>
+              </div>
+              <div class="entry-actions">
+                <span class="ghost">Reuse Prompt</span>
+                <span class="ghost">Open Collection</span>
+                <span class="ghost">Copy</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="insights">
+          <section class="insight-card">
+            <h3>Archive Notes</h3>
+            <p>
+              这一页的重点不是“管理记录”，而是把历史结果变成可以被回看、复用、再创作的素材。页面需要有收藏库气质，而不是后台日志气质。
+            </p>
+          </section>
+
+          <section class="insight-card">
+            <h3>Useful Filters</h3>
+            <ul>
+              <li>按 Collection / 标签 / 时间筛选</li>
+              <li>按是否收藏、是否高复用筛选</li>
+              <li>按 prompt 类型筛选：portrait / interior / brand / lifestyle</li>
+            </ul>
+          </section>
+
+          <section class="insight-card">
+            <h3>Potential Next Layer</h3>
+            <ul>
+              <li>支持同一 prompt 的多个版本</li>
+              <li>支持从历史 prompt 回流到 Prompt Studio</li>
+              <li>支持将高频风格沉淀为 reusable prompt pack</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="footer-note">
+        <span>Static archive concept</span>
+        <span>Prompt history as a reusable creative library</span>
+      </footer>
+    </main>
+  </body>
+</html>
