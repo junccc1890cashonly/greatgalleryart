@@ -35,6 +35,7 @@
       }
       .topbar,
       .toolbar,
+      .utility-bar,
       .footer-note {
         display: flex;
         justify-content: space-between;
@@ -136,9 +137,11 @@
       }
       .hero-panel,
       .toolbar,
+      .utility-bar,
       .sidebar-block,
       .gallery-item,
-      .stat-card {
+      .stat-card,
+      .modal-card {
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.42);
       }
@@ -165,8 +168,15 @@
         margin: 8px 0 24px;
         flex-wrap: wrap;
       }
+      .utility-bar {
+        padding: 16px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
       .toolbar-left,
       .toolbar-right,
+      .utility-left,
+      .utility-right,
       .filters,
       .meta,
       .item-tags {
@@ -208,6 +218,9 @@
       }
       .action.is-disabled {
         opacity: 0.45;
+      }
+      .action.secondary {
+        color: var(--text);
       }
       .layout {
         display: grid;
@@ -251,6 +264,7 @@
       .gallery-item {
         padding: 14px;
         transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        position: relative;
       }
       .gallery-item:hover {
         transform: translateY(-2px);
@@ -261,6 +275,19 @@
       }
       .gallery-item.is-hidden {
         display: none;
+      }
+      .gallery-item.is-user-photo::before {
+        content: "Uploaded";
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        padding: 6px 8px;
+        color: #fffdf9;
+        background: rgba(29, 26, 23, 0.56);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
       }
       .gallery-cover {
         aspect-ratio: 0.82;
@@ -295,6 +322,87 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(29, 26, 23, 0.36);
+        backdrop-filter: blur(8px);
+      }
+      .modal.is-open {
+        display: flex;
+      }
+      .modal-card {
+        width: min(560px, 100%);
+        padding: 22px;
+        background: rgba(255, 250, 244, 0.96);
+        box-shadow: var(--shadow);
+      }
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .modal-head h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+      }
+      .modal-close {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.54);
+        color: var(--muted);
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+      }
+      .form-stack {
+        display: grid;
+        gap: 14px;
+      }
+      .field-label {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .input,
+      .textarea,
+      .select,
+      .file-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.68);
+        color: var(--text);
+        font: inherit;
+      }
+      .textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      .inline-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .status-message {
+        color: var(--soft);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
       .footer-note {
         margin-top: 28px;
         padding-top: 18px;
@@ -318,6 +426,7 @@
           padding: 18px;
         }
         .topbar,
+        .utility-bar,
         .toolbar,
         .footer-note {
           flex-direction: column;
@@ -363,6 +472,16 @@
         </aside>
       </section>
       <section class="toolbar">
+      <section class="utility-bar">
+        <div class="utility-left">
+          <button class="action primary js-open-upload" type="button">Upload Photos</button>
+          <button class="action secondary js-open-collection-modal" type="button">Create Collection</button>
+        </div>
+        <div class="utility-right">
+          <div class="status-message js-gallery-status">Ready to add your own references.</div>
+        </div>
+      </section>
+      <section class="toolbar">
         <div class="toolbar-left">
           <div class="search">Search by theme, hashtag, note...</div>
           <div class="filters">
@@ -383,7 +502,7 @@
         <aside class="sidebar">
           <div class="sidebar-block">
             <h3>Collections</h3>
-            <div class="sidebar-list">
+            <div class="sidebar-list js-collection-list">
               <a href="./collection.html">Quiet Luxury</a>
               <a href="./collection.html">Soft Portrait Notes</a>
               <a href="./collection.html">Interior Silence</a>
@@ -457,6 +576,66 @@
         <span>Clean grid, low contrast controls, whitespace first</span>
       </footer>
     </main>
+    <div class="modal js-upload-modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Upload Photos</h3>
+          <button class="modal-close js-close-modal" type="button">×</button>
+        </div>
+        <form class="form-stack js-upload-form">
+          <label class="field-label">
+            Select image files
+            <input class="file-input" type="file" accept="image/*" multiple />
+          </label>
+          <label class="field-label">
+            Title prefix
+            <input class="input js-upload-title" type="text" placeholder="Quiet study / still life / editorial..." />
+          </label>
+          <label class="field-label">
+            Note
+            <textarea class="textarea js-upload-note" placeholder="What do you like about this set?"></textarea>
+          </label>
+          <label class="field-label">
+            Collection
+            <select class="select js-upload-collection"></select>
+          </label>
+          <label class="field-label">
+            Tags
+            <input class="input js-upload-tags" type="text" placeholder="editorial, portrait, neutral" />
+          </label>
+          <div class="inline-actions">
+            <div class="status-message js-upload-status">Images stay in this browser for the demo.</div>
+            <button class="action primary" type="submit">Save To Gallery</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal js-collection-modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Create Collection</h3>
+          <button class="modal-close js-close-modal" type="button">×</button>
+        </div>
+        <form class="form-stack js-collection-form">
+          <label class="field-label">
+            Collection name
+            <input class="input js-collection-name" type="text" placeholder="Quiet Interiors / Soft Portraits..." />
+          </label>
+          <label class="field-label">
+            Description
+            <textarea class="textarea js-collection-description" placeholder="Describe the mood, theme, or visual direction."></textarea>
+          </label>
+          <label class="field-label">
+            Collection tags
+            <input class="input js-collection-tags" type="text" placeholder="quiet, interior, editorial" />
+          </label>
+          <div class="inline-actions">
+            <div class="status-message js-collection-status">Collections are stored in local demo memory.</div>
+            <button class="action primary" type="submit">Create Collection</button>
+          </div>
+        </form>
+      </div>
+    </div>
     <script src="./app.js"></script>
   </body>
 </html>

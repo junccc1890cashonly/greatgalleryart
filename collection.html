@@ -90,6 +90,12 @@
         color: inherit;
         text-decoration: none;
       }
+      .hero,
+      .grid,
+      .tag-row,
+      .meta-row {
+        transition: opacity 180ms ease;
+      }
       .nav .current { color: var(--text); }
       .hero {
         align-items: stretch;
@@ -256,17 +262,17 @@
         </nav>
       </header>
       <section class="hero">
-        <div class="cover"></div>
+        <div class="cover js-collection-cover"></div>
         <div class="copy">
           <div class="eyebrow">Collection Overview</div>
-          <h2>Interior Silence</h2>
-          <p>这一组参考图更关注空间中的安静感、材质节奏和克制光线。它不是单纯的室内图册，而是一种适合被转译成品牌视觉、生活方式海报和空间类 prompt 的审美集合。</p>
+          <h2 class="js-collection-name">Interior Silence</h2>
+          <p class="js-collection-description">这一组参考图更关注空间中的安静感、材质节奏和克制光线。它不是单纯的室内图册，而是一种适合被转译成品牌视觉、生活方式海报和空间类 prompt 的审美集合。</p>
           <div class="meta-row">
-            <span class="subtle">31 references</span>
-            <span class="subtle">Updated Apr 22</span>
-            <span class="subtle">Mood: calm / tactile / editorial</span>
+            <span class="subtle js-collection-count">31 references</span>
+            <span class="subtle js-collection-updated">Updated Apr 22</span>
+            <span class="subtle js-collection-mood">Mood: calm / tactile / editorial</span>
           </div>
-          <div class="tag-row">
+          <div class="tag-row js-collection-tags">
             <span class="tag">#interior</span>
             <span class="tag">#neutralpalette</span>
             <span class="tag">#quietspace</span>
@@ -279,7 +285,7 @@
           <h3>Selected Works</h3>
           <p>展示上保留策展气质，每张图都像收藏中的展品，不堆过重的操作层，让气质先成立。</p>
         </div>
-        <div class="grid">
+        <div class="grid js-collection-grid">
           <article class="item"><div class="shot shot-1"></div><h4>Quiet Corner</h4><p>柔和窗光与留白墙面，强调呼吸感。</p></article>
           <article class="item"><div class="shot shot-2"></div><h4>Muted Surface</h4><p>低对比度层次与材料细节的克制组合。</p></article>
           <article class="item"><div class="shot shot-3"></div><h4>Editorial Space</h4><p>更偏画册式视角的空间表达，适合品牌图方向。</p></article>
@@ -291,5 +297,6 @@
         <span>Museum-like presentation with soft editorial framing</span>
       </footer>
     </main>
+    <script src="./app.js"></script>
   </body>
 </html>
