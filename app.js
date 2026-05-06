@@ -1,6 +1,7 @@
 const STORAGE_KEY = "galleryArtSelection";
 const PHOTO_STORAGE_KEY = "galleryArtPhotos";
 const COLLECTION_STORAGE_KEY = "galleryArtCollections";
+const SESSION_UPLOAD_STORAGE_KEY = "galleryArtSessionUploads";
 
 const DEFAULT_COLLECTIONS = [
   {
@@ -109,6 +110,18 @@ function writeData(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+function readSessionUploads() {
+  try {
+    return JSON.parse(sessionStorage.getItem(SESSION_UPLOAD_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function writeSessionUploads(value) {
+  sessionStorage.setItem(SESSION_UPLOAD_STORAGE_KEY, JSON.stringify(value));
+}
+
 function ensureCollections() {
   const existing = readData(COLLECTION_STORAGE_KEY, []);
   if (!existing.length) {
@@ -142,6 +155,7 @@ function setupGallery() {
 
   let collections = ensureCollections();
   let savedPhotos = ensurePhotos();
+  let sessionUploads = readSessionUploads();
   const countTargets = document.querySelectorAll(".js-selected-count");
   const summary = document.querySelector(".js-selection-summary");
   const promptLinks = document.querySelectorAll(".js-open-prompt");
@@ -172,6 +186,14 @@ function setupGallery() {
     attachSelectionHandler(card);
     galleryGrid.prepend(card);
     return card;
+  }
+
+  function renderSessionUploads() {
+    sessionUploads.forEach((photo) => {
+      if (!document.querySelector(`[data-photo-id="${photo.id}"]`)) {
+        createUserPhotoCard(photo);
+      }
+    });
   }
 
   function renderCollectionOptions() {
@@ -360,8 +382,27 @@ function setupGallery() {
           reader.readAsDataURL(file);
         }))
       ).then((photos) => {
-        savedPhotos = [...photos, ...savedPhotos];
-        writeData(PHOTO_STORAGE_KEY, savedPhotos);
+        const lightweightPhotos = photos.map((photo) => ({
+          id: photo.id,
+          title: photo.title,
+          note: photo.note,
+          collectionId: photo.collectionId,
+          tags: photo.tags,
+          image: ""
+        }));
+
+        savedPhotos = [...lightweightPhotos, ...savedPhotos];
+        sessionUploads = [...photos, ...sessionUploads];
+
+        try {
+          writeData(PHOTO_STORAGE_KEY, savedPhotos);
+          writeSessionUploads(sessionUploads);
+        } catch (error) {
+          console.error("Upload persistence failed:", error);
+          status.textContent = "Upload is too large for browser storage. Try a smaller image.";
+          return;
+        }
+
         photos.reverse().forEach((photo) => createUserPhotoCard(photo));
         renderSelection();
         renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
@@ -377,6 +418,7 @@ function setupGallery() {
 
   renderCollectionOptions();
   renderCollectionList();
+  renderSessionUploads();
 
   renderFilter("all");
   renderSelection();
@@ -466,7 +508,7 @@ function setupCollectionPage() {
   const params = new URLSearchParams(window.location.search);
   const selectedId = params.get("collection");
   const collections = ensureCollections();
-  const photos = ensurePhotos();
+  const photos = [...readSessionUploads(), ...ensurePhotos()];
   const collection = collections.find((item) => item.id === selectedId) || collections[0];
   if (!collection) return;
 
