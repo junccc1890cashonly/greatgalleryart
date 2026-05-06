@@ -91,6 +91,9 @@
         color: inherit;
         text-decoration: none;
       }
+      button {
+        font: inherit;
+      }
       .nav .current {
         color: var(--text);
       }
@@ -190,11 +193,21 @@
         padding: 10px 12px;
         font-size: 12px;
       }
+      .pill,
+      .action,
+      .gallery-item,
+      .tag,
+      .sidebar-list a {
+        cursor: pointer;
+      }
       .pill.active,
       .action.primary {
         color: var(--accent);
         background: var(--accent-soft);
         border-color: rgba(85, 107, 95, 0.16);
+      }
+      .action.is-disabled {
+        opacity: 0.45;
       }
       .layout {
         display: grid;
@@ -237,6 +250,17 @@
       }
       .gallery-item {
         padding: 14px;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      }
+      .gallery-item:hover {
+        transform: translateY(-2px);
+      }
+      .gallery-item.is-selected {
+        border-color: rgba(85, 107, 95, 0.28);
+        background: rgba(85, 107, 95, 0.09);
+      }
+      .gallery-item.is-hidden {
+        display: none;
       }
       .gallery-cover {
         aspect-ratio: 0.82;
@@ -263,6 +287,13 @@
       }
       .tag {
         color: var(--muted);
+      }
+      .selection-note {
+        margin-top: 10px;
+        color: var(--soft);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
       .footer-note {
         margin-top: 28px;
@@ -335,17 +366,17 @@
         <div class="toolbar-left">
           <div class="search">Search by theme, hashtag, note...</div>
           <div class="filters">
-            <span class="pill active">All</span>
-            <span class="pill">Editorial</span>
-            <span class="pill">Interior</span>
-            <span class="pill">Portrait</span>
-            <span class="pill">Neutral Palette</span>
+            <button class="pill active" type="button" data-filter="all">All</button>
+            <button class="pill" type="button" data-filter="editorial">Editorial</button>
+            <button class="pill" type="button" data-filter="interior">Interior</button>
+            <button class="pill" type="button" data-filter="portrait">Portrait</button>
+            <button class="pill" type="button" data-filter="neutral">Neutral Palette</button>
           </div>
         </div>
         <div class="toolbar-right">
-          <span class="action">Latest</span>
-          <span class="action">Multi Select</span>
-          <a class="action primary" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Generate Prompt</a>
+          <button class="action" type="button">Latest</button>
+          <button class="action" type="button">Multi Select</button>
+          <a class="action primary js-open-prompt" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Generate Prompt</a>
         </div>
       </section>
       <section class="layout">
@@ -371,47 +402,48 @@
           </div>
           <div class="sidebar-block">
             <h3>Current Selection</h3>
-            <p class="copy">6 images selected for the next prompt study</p>
-            <a class="action primary" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Open Prompt Studio</a>
+            <p class="copy"><span class="js-selected-count">0</span> images selected for the next prompt study</p>
+            <div class="selection-note js-selection-summary">Select references to prepare a Lovart prompt set.</div>
+            <a class="action primary js-open-prompt" href="/Users/junc/Documents/galleryArt/prompt-studio.html">Open Prompt Studio</a>
           </div>
         </aside>
         <div class="gallery-grid">
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="quiet-figure" data-tags="portrait editorial quietluxury softlight">
             <div class="gallery-cover cover-1"></div>
             <h4>Quiet Figure</h4>
             <p>柔和人物姿态与较大的呼吸区，适合提炼 editorial 人像方向。</p>
             <div class="meta">Added Apr 19 · Collection Quiet Luxury</div>
             <div class="item-tags"><span class="tag">#portrait</span><span class="tag">#softlight</span></div>
           </article>
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="textural-living" data-tags="interior neutral quietluxury">
             <div class="gallery-cover cover-2"></div>
             <h4>Textural Living</h4>
             <p>带材质层次的室内生活图像，适合生成空间与品牌氛围 prompt。</p>
             <div class="meta">Added Apr 17 · Collection Interior Silence</div>
             <div class="item-tags"><span class="tag">#interior</span><span class="tag">#neutral</span></div>
           </article>
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="curated-room" data-tags="interior neutral negativespace">
             <div class="gallery-cover cover-3"></div>
             <h4>Curated Room</h4>
             <p>安静、克制、结构感强的空间构图，强调留白与柔和质地。</p>
             <div class="meta">Added Apr 15 · Collection Interior Silence</div>
             <div class="item-tags"><span class="tag">#space</span><span class="tag">#negative-space</span></div>
           </article>
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="soft-portrait-notes" data-tags="portrait editorial fashion">
             <div class="gallery-cover cover-4"></div>
             <h4>Soft Portrait Notes</h4>
             <p>轻柔色阶与时尚感人物构图，适合人像类 prompt 的审美参考。</p>
             <div class="meta">Added Apr 12 · Collection Soft Portrait Notes</div>
             <div class="item-tags"><span class="tag">#editorial</span><span class="tag">#fashion</span></div>
           </article>
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="slow-detail" data-tags="neutral detail lifestyle">
             <div class="gallery-cover cover-5"></div>
             <h4>Slow Detail</h4>
             <p>偏生活化的特写与局部构图，适合更安静的品牌内容表达。</p>
             <div class="meta">Added Apr 11 · Collection Muted Objects</div>
             <div class="item-tags"><span class="tag">#detail</span><span class="tag">#warm-neutral</span></div>
           </article>
-          <article class="gallery-item">
+          <article class="gallery-item" data-photo-id="quiet-window-light" data-tags="quietluxury light neutral">
             <div class="gallery-cover cover-6"></div>
             <h4>Quiet Window Light</h4>
             <p>以光感和留白为主的画面，适合生成 calm atmosphere 方向的 prompt。</p>
@@ -425,5 +457,6 @@
         <span>Clean grid, low contrast controls, whitespace first</span>
       </footer>
     </main>
+    <script src="/Users/junc/Documents/galleryArt/app.js"></script>
   </body>
 </html>

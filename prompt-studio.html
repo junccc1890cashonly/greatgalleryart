@@ -88,6 +88,9 @@
         color: inherit;
         text-decoration: none;
       }
+      button {
+        font: inherit;
+      }
       .nav .current { color: var(--text); }
       .hero {
         align-items: end;
@@ -172,6 +175,31 @@
         border: 1px solid var(--line);
         background-size: cover;
         background-position: center;
+        position: relative;
+        transition: transform 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      }
+      .selection-card::after {
+        content: "Selected";
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+        padding: 6px 8px;
+        color: #fffdf9;
+        background: rgba(29, 26, 23, 0.58);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0;
+      }
+      .selection-card.is-active {
+        border-color: rgba(85, 107, 95, 0.28);
+        transform: translateY(-2px);
+      }
+      .selection-card.is-active::after {
+        opacity: 1;
+      }
+      .selection-card.is-muted {
+        opacity: 0.38;
       }
       .ref-1 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
       .ref-2 { background-image: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"); }
@@ -182,12 +210,51 @@
         display: grid;
         gap: 14px;
       }
+      .field-head,
+      .analysis-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
       .field p,
       .analysis-card p,
       .prompt-card p {
         margin: 10px 0 0;
         color: var(--muted);
         line-height: 1.85;
+      }
+      .toggle-button,
+      .ghost-button {
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.54);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .analysis-content.is-collapsed,
+      .prompt-content.is-collapsed {
+        max-height: 96px;
+        overflow: hidden;
+        position: relative;
+      }
+      .analysis-content.is-collapsed::after,
+      .prompt-content.is-collapsed::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 54px;
+        background: linear-gradient(180deg, rgba(255, 252, 247, 0), rgba(255, 252, 247, 0.96));
+      }
+      .prompt-helper {
+        margin-top: 10px;
+        color: var(--soft);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
       .tag-row {
         display: grid;
@@ -267,7 +334,7 @@
         </div>
         <aside class="status-box">
           <div class="label subtle">Selected References</div>
-          <strong>04</strong>
+          <strong class="js-selected-count">04</strong>
           <div class="subtle">mode: style fusion</div>
         </aside>
       </section>
@@ -275,17 +342,21 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Reference Selection</h3>
-            <span class="subtle">Quiet Luxury / Interior Silence</span>
+            <span class="subtle js-selection-label">Quiet Luxury / Interior Silence</span>
           </div>
           <div class="selection-grid">
-            <div class="selection-card ref-1"></div>
-            <div class="selection-card ref-2"></div>
-            <div class="selection-card ref-3"></div>
-            <div class="selection-card ref-4"></div>
+            <div class="selection-card ref-1" data-ref-index="0"></div>
+            <div class="selection-card ref-2" data-ref-index="1"></div>
+            <div class="selection-card ref-3" data-ref-index="2"></div>
+            <div class="selection-card ref-4" data-ref-index="3"></div>
           </div>
+          <div class="prompt-helper js-selection-helper">Selected references will be carried over from the Gallery page.</div>
           <div class="field-stack" style="margin-top: 18px;">
             <div class="field">
-              <div class="label">Creative Direction</div>
+              <div class="field-head">
+                <div class="label">Creative Direction</div>
+                <button class="ghost-button js-refresh-selection" type="button">Refresh Selection</button>
+              </div>
               <p>希望保留极简、安静、高级的空间氛围，同时让画面更偏现代生活方式品牌的编辑感。</p>
             </div>
             <div class="field">
@@ -296,11 +367,20 @@
         </div>
         <div class="analysis-stack">
           <section class="analysis-card">
-            <div class="label">Style Summary</div>
-            <p>整体视觉气质偏安静的高级感，重点不是强烈视觉刺激，而是由柔和光线、低饱和中性色、克制构图和材质细节共同构成的编辑式氛围。画面节奏慢，信息量低，但仍然具有品牌级完成度。</p>
+            <div class="analysis-head">
+              <div class="label">Style Summary</div>
+              <button class="toggle-button" type="button" data-target="style-summary">Expand</button>
+            </div>
+            <div class="analysis-content is-collapsed" data-collapsible="style-summary">
+              <p>整体视觉气质偏安静的高级感，重点不是强烈视觉刺激，而是由柔和光线、低饱和中性色、克制构图和材质细节共同构成的编辑式氛围。画面节奏慢，信息量低，但仍然具有品牌级完成度。它适合品牌视觉、生活方式海报和空间型创意图，不追求堆叠信息，而追求呼吸感与留白中的高级节奏。</p>
+            </div>
           </section>
           <section class="analysis-card">
-            <div class="label">Suggested Hashtags</div>
+            <div class="analysis-head">
+              <div class="label">Suggested Hashtags</div>
+              <button class="toggle-button" type="button" data-target="tag-bank">Collapse</button>
+            </div>
+            <div class="analysis-content" data-collapsible="tag-bank">
             <div class="tag-row">
               <span class="tag">#quietluxury</span>
               <span class="tag">#editorialspace</span>
@@ -309,10 +389,16 @@
               <span class="tag">#curatedliving</span>
               <span class="tag">#negative-space</span>
             </div>
+            </div>
           </section>
           <section class="prompt-card">
-            <div class="label">Lovart Prompt</div>
-            <p>Create a modern editorial lifestyle scene with soft daylight, quiet luxury atmosphere, restrained neutral tones, tactile materials, subtle texture contrasts, and generous negative space. The composition should feel calm, curated, and premium rather than decorative, with elegant framing, understated styling, and a refined visual rhythm suitable for a contemporary design-forward brand campaign.</p>
+            <div class="analysis-head">
+              <div class="label">Lovart Prompt</div>
+              <button class="toggle-button" type="button" data-target="lovart-prompt">Expand Prompt</button>
+            </div>
+            <div class="prompt-content is-collapsed" data-collapsible="lovart-prompt">
+              <p>Create a modern editorial lifestyle scene with soft daylight, quiet luxury atmosphere, restrained neutral tones, tactile materials, subtle texture contrasts, and generous negative space. The composition should feel calm, curated, and premium rather than decorative, with elegant framing, understated styling, and a refined visual rhythm suitable for a contemporary design-forward brand campaign. Focus on measured spacing, museum-like stillness, and premium lifestyle branding energy rather than overt luxury tropes. Keep the framing minimal, the color palette warm and mineral, and the atmosphere intimate, reflective, and design-forward.</p>
+            </div>
           </section>
         </div>
       </section>
@@ -321,5 +407,6 @@
         <span>Image selection on the left, calm editorial output on the right</span>
       </footer>
     </main>
+    <script src="/Users/junc/Documents/galleryArt/app.js"></script>
   </body>
 </html>

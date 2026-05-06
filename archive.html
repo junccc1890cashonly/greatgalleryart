@@ -105,6 +105,9 @@
         color: inherit;
         text-decoration: none;
       }
+      button {
+        font: inherit;
+      }
 
       .nav .current {
         color: var(--text);
@@ -247,6 +250,11 @@
         grid-template-columns: 220px 1fr;
         gap: 16px;
         padding: 16px;
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+      .entry.is-expanded {
+        border-color: rgba(85, 107, 95, 0.26);
+        background: rgba(85, 107, 95, 0.08);
       }
 
       .entry-visual {
@@ -286,6 +294,20 @@
 
       .entry-actions {
         margin-top: 14px;
+      }
+      .entry-detail {
+        display: none;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(44, 39, 34, 0.08);
+      }
+      .entry-detail.is-visible {
+        display: block;
+      }
+      .entry-detail p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.85;
       }
 
       .insights {
@@ -409,10 +431,10 @@
       <section class="toolbar">
         <div class="toolbar-left">
           <div class="search">Search by collection, prompt text, hashtag...</div>
-          <span class="pill active">All History</span>
-          <span class="pill">Starred</span>
-          <span class="pill">Quiet Luxury</span>
-          <span class="pill">Interior Silence</span>
+          <button class="pill active" type="button">All History</button>
+          <button class="pill" type="button">Starred</button>
+          <button class="pill" type="button">Quiet Luxury</button>
+          <button class="pill" type="button">Interior Silence</button>
         </div>
         <div class="toolbar-right">
           <span class="ghost">Latest First</span>
@@ -436,9 +458,12 @@
                 <span class="tag">#softdaylight</span>
               </div>
               <div class="entry-actions">
-                <span class="ghost">Reuse Prompt</span>
+                <button class="ghost js-entry-toggle" type="button" data-target="archive-detail-1">Expand Entry</button>
                 <span class="ghost">View Source Set</span>
                 <span class="ghost">Copy</span>
+              </div>
+              <div class="entry-detail" id="archive-detail-1">
+                <p>Based on 6 references from Quiet Luxury and Interior Silence. High reuse score for lifestyle branding, soft retail campaigns, and editorial landing pages.</p>
               </div>
             </div>
           </article>
@@ -457,9 +482,12 @@
                 <span class="tag">#mutedtones</span>
               </div>
               <div class="entry-actions">
-                <span class="ghost">Reuse Prompt</span>
+                <button class="ghost js-entry-toggle" type="button" data-target="archive-detail-2">Expand Entry</button>
                 <span class="ghost">Edit Version</span>
                 <span class="ghost">Copy</span>
+              </div>
+              <div class="entry-detail" id="archive-detail-2">
+                <p>Best used for portrait-focused campaigns. Suggested follow-up variation: add stronger magazine crop and lower saturation for a more luxury fashion direction.</p>
               </div>
             </div>
           </article>
@@ -478,9 +506,12 @@
                 <span class="tag">#negativespace</span>
               </div>
               <div class="entry-actions">
-                <span class="ghost">Reuse Prompt</span>
+                <button class="ghost js-entry-toggle" type="button" data-target="archive-detail-3">Expand Entry</button>
                 <span class="ghost">Open Collection</span>
                 <span class="ghost">Copy</span>
+              </div>
+              <div class="entry-detail" id="archive-detail-3">
+                <p>Derived from interior references with negative-space bias. Strong candidate for packaging campaigns, furniture editorials, and architectural moodboards.</p>
               </div>
             </div>
           </article>
@@ -519,5 +550,6 @@
         <span>Prompt history as a reusable creative library</span>
       </footer>
     </main>
+    <script src="/Users/junc/Documents/galleryArt/app.js"></script>
   </body>
 </html>
