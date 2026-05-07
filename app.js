@@ -158,13 +158,21 @@ async function postJson(url, payload) {
     body: JSON.stringify(payload)
   });
 
-  const data = await response.json().catch(() => ({}));
+  const rawText = await response.text();
+  let data = {};
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    data = {};
+  }
+
   if (!response.ok) {
     const rawError = data?.error;
+    const textError = typeof rawText === "string" ? rawText.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "";
     const message =
       typeof rawError === "string"
         ? rawError
-        : rawError?.message || rawError?.error || `Request failed (${response.status})`;
+        : rawError?.message || rawError?.error || textError || `Request failed (${response.status})`;
     throw new Error(message);
   }
   return data;
