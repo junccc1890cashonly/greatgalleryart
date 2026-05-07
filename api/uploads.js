@@ -30,6 +30,17 @@ function sanitizeFilename(filename) {
     .replace(/-+/g, "-");
 }
 
+async function waitForBlobUrl(url, attempts = 8, delay = 400) {
+  for (let index = 0; index < attempts; index += 1) {
+    const response = await fetch(url, { method: "HEAD", cache: "no-store" }).catch(() => null);
+    if (response?.ok) {
+      return true;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  return false;
+}
+
 export default async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
@@ -54,6 +65,12 @@ export default async function handler(request, response) {
       addRandomSuffix: true,
       contentType
     });
+
+    const isReachable = await waitForBlobUrl(blob.url);
+    if (!isReachable) {
+      throw new Error("Uploaded blob URL is not reachable yet.");
+    }
+
     return response.status(200).json({ url: blob.url });
   } catch (error) {
     console.error("Failed to upload photo:", error);
