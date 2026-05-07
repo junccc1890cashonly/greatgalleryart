@@ -149,8 +149,16 @@ async function fetchGalleryState() {
 }
 
 async function postJson(url, payload) {
+  return requestJson(url, "POST", payload);
+}
+
+async function deleteJson(url, payload) {
+  return requestJson(url, "DELETE", payload);
+}
+
+async function requestJson(url, method, payload) {
   const response = await fetch(url, {
-    method: "POST",
+    method,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json"
@@ -185,11 +193,14 @@ function createUploadedCard(photo, collections) {
   card.dataset.tags = (photo.tags || []).join(" ");
   const collectionName = getCollectionName(collections, photo.collectionId);
   card.innerHTML = `
-    <div class="gallery-cover" style="background-image:url('${photo.image}')"></div>
+    <div class="gallery-cover">
+      <img class="gallery-image" src="${photo.image}" alt="${photo.title}" loading="lazy" />
+    </div>
     <h4>${photo.title}</h4>
     <p>${photo.note || "Uploaded personal reference."}</p>
     <div class="meta">Stored in Blob · Collection ${collectionName}</div>
     <div class="item-tags">${(photo.tags || []).map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
+    <button class="delete-action js-delete-photo" type="button">Delete</button>
   `;
   return card;
 }
@@ -371,6 +382,26 @@ function setupGallery() {
         const card = createUploadedCard(photo, remoteState.collections);
         uploadedGrid.append(card);
         attachSelectionHandler(card);
+        const deleteButton = card.querySelector(".js-delete-photo");
+        if (deleteButton) {
+          deleteButton.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            deleteButton.disabled = true;
+            try {
+              const result = await deleteJson("./api/photos", { id: photo.id });
+              remoteState = result.state;
+              renderCollectionOptions();
+              renderCollectionList();
+              renderUploadedPhotos();
+              renderSelection();
+              refreshGalleryStatus("Photo removed from your gallery.");
+            } catch (error) {
+              console.error("Delete failed:", error);
+              refreshGalleryStatus(error.message || "Photo could not be deleted.");
+              deleteButton.disabled = false;
+            }
+          });
+        }
       });
     renderUploadedVisibility();
   }
@@ -698,7 +729,9 @@ async function setupCollectionPage() {
       gridNode.innerHTML = collectionPhotos
         .map((photo) => `
           <article class="item">
-            <div class="shot" style="background-image:url('${photo.image}')"></div>
+            <div class="shot">
+              <img class="shot-image" src="${photo.image}" alt="${photo.title}" loading="lazy" />
+            </div>
             <h4>${photo.title}</h4>
             <p>${photo.note || "Uploaded personal reference."}</p>
           </article>
