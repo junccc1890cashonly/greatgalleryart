@@ -166,6 +166,29 @@
         padding-top: 26px;
         border-top: 1px solid var(--line);
       }
+      .collection-switcher {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .switch-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.48);
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .switch-chip.current {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-color: rgba(85, 107, 95, 0.16);
+      }
       .section-head {
         display: flex;
         justify-content: space-between;
@@ -211,6 +234,13 @@
         margin: 0;
         color: var(--muted);
         font-size: 14px;
+        line-height: 1.8;
+      }
+      .empty-state {
+        padding: 30px 24px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+        color: var(--muted);
         line-height: 1.8;
       }
       .footer-note {
@@ -281,6 +311,7 @@
         </div>
       </section>
       <section class="section">
+        <div class="collection-switcher js-collection-switcher"></div>
         <div class="section-head">
           <h3>Selected Works</h3>
           <p>展示上保留策展气质，每张图都像收藏中的展品，不堆过重的操作层，让气质先成立。</p>

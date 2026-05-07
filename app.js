@@ -2,6 +2,7 @@ const STORAGE_KEY = "galleryArtSelection";
 const PHOTO_STORAGE_KEY = "galleryArtPhotos";
 const COLLECTION_STORAGE_KEY = "galleryArtCollections";
 const SESSION_UPLOAD_STORAGE_KEY = "galleryArtSessionUploads";
+const ACTIVE_COLLECTION_KEY = "galleryArtActiveCollection";
 
 const DEFAULT_COLLECTIONS = [
   {
@@ -85,6 +86,15 @@ const DEFAULT_PHOTOS = [
   }
 ];
 
+const DEFAULT_PHOTO_IMAGE_MAP = {
+  "quiet-figure": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+  "textural-living": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80",
+  "curated-room": "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80",
+  "soft-portrait-notes": "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=900&q=80",
+  "slow-detail": "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80",
+  "quiet-window-light": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
+};
+
 function readSelection() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -120,6 +130,14 @@ function readSessionUploads() {
 
 function writeSessionUploads(value) {
   sessionStorage.setItem(SESSION_UPLOAD_STORAGE_KEY, JSON.stringify(value));
+}
+
+function readActiveCollection() {
+  return localStorage.getItem(ACTIVE_COLLECTION_KEY) || "";
+}
+
+function writeActiveCollection(collectionId) {
+  localStorage.setItem(ACTIVE_COLLECTION_KEY, collectionId);
 }
 
 function ensureCollections() {
@@ -227,8 +245,14 @@ function setupGallery() {
   function renderCollectionList() {
     if (!collectionList) return;
     collectionList.innerHTML = collections
-      .map((collection) => `<a href="./collection.html?collection=${collection.id}">${collection.name}</a>`)
+      .map((collection) => `<a href="./collection.html?collection=${collection.id}" data-collection-link="${collection.id}">${collection.name}</a>`)
       .join("");
+
+    collectionList.querySelectorAll("[data-collection-link]").forEach((link) => {
+      link.addEventListener("click", () => {
+        writeActiveCollection(link.dataset.collectionLink || "");
+      });
+    });
   }
 
   function openModal(modal) {
@@ -353,6 +377,7 @@ function setupGallery() {
       };
       collections = [collection, ...collections];
       writeData(COLLECTION_STORAGE_KEY, collections);
+      writeActiveCollection(collection.id);
       renderCollectionOptions();
       renderCollectionList();
       refreshGalleryStatus(`${name} created and ready for uploads.`);
@@ -425,12 +450,14 @@ function setupGallery() {
         try {
           writeData(PHOTO_STORAGE_KEY, savedPhotos);
           writeSessionUploads(sessionUploads);
+          writeActiveCollection(collectionSelect.value);
         } catch (error) {
           console.error("Upload persistence failed:", error);
           successfulPhotos.slice().reverse().forEach((photo) => createUserPhotoCard(photo));
           renderUploadedVisibility();
           renderSelection();
           renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
+          writeActiveCollection(collectionSelect.value);
           closeModal(uploadModal);
           uploadForm.reset();
           status.textContent = "Saved for this page view only. Browser storage limit was reached.";
@@ -544,7 +571,7 @@ function setupCollectionPage() {
   if (!nameNode) return;
 
   const params = new URLSearchParams(window.location.search);
-  const selectedId = params.get("collection");
+  const selectedId = params.get("collection") || readActiveCollection();
   const collections = ensureCollections();
   const photos = [...readSessionUploads(), ...ensurePhotos()];
   const collection = collections.find((item) => item.id === selectedId) || collections[0];
@@ -556,6 +583,9 @@ function setupCollectionPage() {
   const moodNode = document.querySelector(".js-collection-mood");
   const tagsNode = document.querySelector(".js-collection-tags");
   const gridNode = document.querySelector(".js-collection-grid");
+  const switcherNode = document.querySelector(".js-collection-switcher");
+
+  writeActiveCollection(collection.id);
 
   nameNode.textContent = collection.name;
   if (descriptionNode) {
@@ -576,12 +606,29 @@ function setupCollectionPage() {
       .map((tag) => `<span class="tag">#${tag}</span>`)
       .join("");
   }
-  if (gridNode && collectionPhotos.length) {
+  if (switcherNode) {
+    switcherNode.innerHTML = collections
+      .map((item) => `
+        <a class="switch-chip ${item.id === collection.id ? "current" : ""}" href="./collection.html?collection=${item.id}">
+          ${item.name}
+        </a>
+      `)
+      .join("");
+  }
+  if (gridNode) {
+    if (!collectionPhotos.length) {
+      gridNode.innerHTML = `
+        <div class="empty-state">
+          This collection does not have any uploaded photos yet. Go back to Gallery, upload a photo, and assign it to <strong>${collection.name}</strong>.
+        </div>
+      `;
+      return;
+    }
+
     gridNode.innerHTML = collectionPhotos
       .map((photo) => {
-        const visual = photo.image
-          ? `style="background-image:url('${photo.image}')" `
-          : "";
+        const imageSource = photo.image || DEFAULT_PHOTO_IMAGE_MAP[photo.id] || "";
+        const visual = imageSource ? `style="background-image:url('${imageSource}')" ` : "";
         return `
           <article class="item">
             <div class="shot" ${visual}></div>
