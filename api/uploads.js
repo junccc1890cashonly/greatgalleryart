@@ -1,6 +1,14 @@
 import { put } from "@vercel/blob";
 import { createPhotoRecord, formatShortDate, updateGalleryState } from "../lib/gallery-state.js";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "20mb"
+    }
+  }
+};
+
 function parseRequestBody(request) {
   return typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
 }

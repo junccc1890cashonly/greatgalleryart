@@ -160,7 +160,12 @@ async function postJson(url, payload) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error || `Request failed (${response.status})`);
+    const rawError = data?.error;
+    const message =
+      typeof rawError === "string"
+        ? rawError
+        : rawError?.message || rawError?.error || `Request failed (${response.status})`;
+    throw new Error(message);
   }
   return data;
 }
