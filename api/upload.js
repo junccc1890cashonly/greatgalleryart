@@ -20,7 +20,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    const body = await request.json();
+    const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
     const jsonResponse = await handleUpload({
       body,
       request,

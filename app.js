@@ -1,5 +1,3 @@
-import { upload } from "https://esm.sh/@vercel/blob/client";
-
 const STORAGE_KEY = "galleryArtSelection";
 const ACTIVE_COLLECTION_KEY = "galleryArtActiveCollection";
 
@@ -135,6 +133,15 @@ function buildFallbackState() {
     collections: DEFAULT_COLLECTIONS,
     photos: DEFAULT_PHOTOS
   };
+}
+
+let blobClientPromise;
+
+async function loadBlobClient() {
+  if (!blobClientPromise) {
+    blobClientPromise = import("https://esm.sh/@vercel/blob/client");
+  }
+  return blobClientPromise;
 }
 
 async function fetchGalleryState() {
@@ -458,6 +465,7 @@ function setupGallery() {
       refreshGalleryStatus("Uploading references to permanent storage...");
 
       try {
+        const { upload } = await loadBlobClient();
         for (const [index, file] of files.entries()) {
           const title = titleInput.value.trim()
             ? `${titleInput.value.trim()} ${index + 1}`
