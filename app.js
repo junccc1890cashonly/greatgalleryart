@@ -192,9 +192,13 @@ function createUploadedCard(photo, collections) {
   card.dataset.photoId = photo.id;
   card.dataset.tags = (photo.tags || []).join(" ");
   const collectionName = getCollectionName(collections, photo.collectionId);
+  const imageUrl = String(photo.image || "").trim();
   card.innerHTML = `
     <div class="gallery-cover">
-      <img class="gallery-image" src="${photo.image}" alt="${photo.title}" loading="lazy" />
+      ${imageUrl
+        ? `<img class="gallery-image" src="${imageUrl}" alt="${photo.title}" loading="lazy" />
+           <a class="image-link" href="${imageUrl}" target="_blank" rel="noreferrer">Open image</a>`
+        : `<div class="image-empty">Image URL missing</div>`}
     </div>
     <h4>${photo.title}</h4>
     <p>${photo.note || "Uploaded personal reference."}</p>
@@ -727,15 +731,21 @@ async function setupCollectionPage() {
       `;
     } else {
       gridNode.innerHTML = collectionPhotos
-        .map((photo) => `
+        .map((photo) => {
+          const imageUrl = String(photo.image || "").trim();
+          return `
           <article class="item">
             <div class="shot">
-              <img class="shot-image" src="${photo.image}" alt="${photo.title}" loading="lazy" />
+              ${imageUrl
+                ? `<img class="shot-image" src="${imageUrl}" alt="${photo.title}" loading="lazy" />
+                   <a class="image-link image-link-collection" href="${imageUrl}" target="_blank" rel="noreferrer">Open image</a>`
+                : `<div class="image-empty">Image URL missing</div>`}
             </div>
             <h4>${photo.title}</h4>
             <p>${photo.note || "Uploaded personal reference."}</p>
           </article>
-        `)
+        `;
+        })
         .join("");
     }
   }

@@ -218,16 +218,42 @@
       .shot {
         aspect-ratio: 0.84;
         border: 1px solid var(--line);
-        background-size: cover;
-        background-position: center;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.68);
+        position: relative;
       }
       .shot-image {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        background: #f3eee7;
+      }
+      .image-link {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        z-index: 2;
+        padding: 6px 8px;
+        background: rgba(29, 26, 23, 0.58);
+        color: #fffdf9;
+        text-decoration: none;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .image-link-collection {
+        bottom: 8px;
+      }
+      .image-empty {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        color: var(--soft);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
       .shot-1 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
       .shot-2 { background-image: url("https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=900&q=80"); }
