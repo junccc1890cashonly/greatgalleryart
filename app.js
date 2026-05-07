@@ -45,7 +45,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "quiet-figure",
     title: "Quiet Figure",
-    note: "柔和人物姿态与较大的呼吸区，适合提炼 editorial 人像方向。",
+    note: "A soft portrait with generous negative space, useful for extracting an editorial portrait direction.",
     collectionId: "quiet-luxury",
     tags: ["portrait", "editorial", "quietluxury", "softlight"],
     image: DEFAULT_PHOTO_IMAGE_MAP["quiet-figure"]
@@ -53,7 +53,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "textural-living",
     title: "Textural Living",
-    note: "带材质层次的室内生活图像，适合生成空间与品牌氛围 prompt。",
+    note: "An interior lifestyle image with layered materials, ideal for spatial and brand atmosphere prompts.",
     collectionId: "interior-silence",
     tags: ["interior", "neutral", "quietluxury"],
     image: DEFAULT_PHOTO_IMAGE_MAP["textural-living"]
@@ -61,7 +61,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "curated-room",
     title: "Curated Room",
-    note: "安静、克制、结构感强的空间构图，强调留白与柔和质地。",
+    note: "A restrained, structured interior composition focused on negative space and soft surfaces.",
     collectionId: "interior-silence",
     tags: ["interior", "neutral", "negativespace"],
     image: DEFAULT_PHOTO_IMAGE_MAP["curated-room"]
@@ -69,7 +69,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "soft-portrait-notes",
     title: "Soft Portrait Notes",
-    note: "轻柔色阶与时尚感人物构图，适合人像类 prompt 的审美参考。",
+    note: "A soft-toned fashion portrait composition that works well as a reference for portrait prompts.",
     collectionId: "soft-portrait-notes",
     tags: ["portrait", "editorial", "fashion"],
     image: DEFAULT_PHOTO_IMAGE_MAP["soft-portrait-notes"]
@@ -77,7 +77,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "slow-detail",
     title: "Slow Detail",
-    note: "偏生活化的特写与局部构图，适合更安静的品牌内容表达。",
+    note: "A lifestyle close-up with a quiet framing style, well suited for calm brand storytelling.",
     collectionId: "muted-objects",
     tags: ["neutral", "detail", "lifestyle"],
     image: DEFAULT_PHOTO_IMAGE_MAP["slow-detail"]
@@ -85,7 +85,7 @@ const DEFAULT_PHOTOS = [
   {
     id: "quiet-window-light",
     title: "Quiet Window Light",
-    note: "以光感和留白为主的画面，适合生成 calm atmosphere 方向的 prompt。",
+    note: "A light-led composition with generous space, useful for calm atmosphere prompt directions.",
     collectionId: "quiet-luxury",
     tags: ["quietluxury", "light", "neutral"],
     image: DEFAULT_PHOTO_IMAGE_MAP["quiet-window-light"]
