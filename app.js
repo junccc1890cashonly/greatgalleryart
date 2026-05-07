@@ -503,13 +503,21 @@ function setupGallery() {
             : file.name.replace(/\.[^.]+$/, "");
           const dataUrl = await compressImageFile(file);
 
-          const photoResult = await postJson("./api/uploads", {
+          const uploadResult = await postJson("./api/uploads", {
             title,
             note: noteInput.value.trim() || "Uploaded personal reference.",
             collectionId,
             tags: tags.length ? tags : ["uploaded", "personal-reference"],
             filename: file.name,
             dataUrl
+          });
+
+          const photoResult = await postJson("./api/photos", {
+            title,
+            note: noteInput.value.trim() || "Uploaded personal reference.",
+            collectionId,
+            tags: tags.length ? tags : ["uploaded", "personal-reference"],
+            image: uploadResult.url
           });
 
           savedPhotos.push(photoResult.photo);

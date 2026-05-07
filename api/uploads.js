@@ -1,5 +1,4 @@
 import { put } from "@vercel/blob";
-import { createPhotoRecord, formatShortDate, updateGalleryState } from "../lib/gallery-state.js";
 
 export const config = {
   api: {
@@ -41,8 +40,6 @@ export default async function handler(request, response) {
     const body = parseRequestBody(request);
     const title = String(body?.title || "").trim();
     const collectionId = String(body?.collectionId || "").trim();
-    const note = String(body?.note || "").trim();
-    const tags = Array.isArray(body?.tags) ? body.tags : [];
     const filename = sanitizeFilename(body?.filename);
 
     if (!title || !collectionId || !body?.dataUrl) {
@@ -57,30 +54,7 @@ export default async function handler(request, response) {
       addRandomSuffix: true,
       contentType
     });
-
-    const photo = createPhotoRecord({
-      title,
-      note,
-      collectionId,
-      tags,
-      image: blob.url
-    });
-
-    const state = await updateGalleryState((currentState) => {
-      const collections = currentState.collections.map((collection) =>
-        collection.id === photo.collectionId
-          ? { ...collection, updatedAt: formatShortDate() }
-          : collection
-      );
-
-      return {
-        ...currentState,
-        collections,
-        photos: [photo, ...currentState.photos]
-      };
-    });
-
-    return response.status(200).json({ photo, state });
+    return response.status(200).json({ url: blob.url });
   } catch (error) {
     console.error("Failed to upload photo:", error);
     return response.status(500).json({
