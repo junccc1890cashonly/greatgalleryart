@@ -121,6 +121,15 @@ function getCollectionName(collections, collectionId) {
   return found ? found.name : "Unsorted Collection";
 }
 
+function getProxiedImageUrl(url) {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  if (value.includes(".blob.vercel-storage.com")) {
+    return `./api/image?url=${encodeURIComponent(value)}`;
+  }
+  return value;
+}
+
 function normalizeTagList(value) {
   return String(value || "")
     .split(",")
@@ -193,11 +202,12 @@ function createUploadedCard(photo, collections) {
   card.dataset.tags = (photo.tags || []).join(" ");
   const collectionName = getCollectionName(collections, photo.collectionId);
   const imageUrl = String(photo.image || "").trim();
+  const proxiedImageUrl = getProxiedImageUrl(imageUrl);
   card.innerHTML = `
     <div class="gallery-cover">
       ${imageUrl
-        ? `<img class="gallery-image" src="${imageUrl}" alt="${photo.title}" loading="lazy" />
-           <a class="image-link" href="${imageUrl}" target="_blank" rel="noreferrer">Open image</a>`
+        ? `<img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />
+           <a class="image-link" href="${proxiedImageUrl}" target="_blank" rel="noreferrer">Open image</a>`
         : `<div class="image-empty">Image URL missing</div>`}
     </div>
     <h4>${photo.title}</h4>
@@ -733,12 +743,13 @@ async function setupCollectionPage() {
       gridNode.innerHTML = collectionPhotos
         .map((photo) => {
           const imageUrl = String(photo.image || "").trim();
+          const proxiedImageUrl = getProxiedImageUrl(imageUrl);
           return `
           <article class="item">
             <div class="shot">
               ${imageUrl
-                ? `<img class="shot-image" src="${imageUrl}" alt="${photo.title}" loading="lazy" />
-                   <a class="image-link image-link-collection" href="${imageUrl}" target="_blank" rel="noreferrer">Open image</a>`
+                ? `<img class="shot-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />
+                   <a class="image-link image-link-collection" href="${proxiedImageUrl}" target="_blank" rel="noreferrer">Open image</a>`
                 : `<div class="image-empty">Image URL missing</div>`}
             </div>
             <h4>${photo.title}</h4>
