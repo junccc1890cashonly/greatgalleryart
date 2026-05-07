@@ -1,0 +1,82 @@
+import { put } from "@vercel/blob";
+import { createPhotoRecord, formatShortDate, updateGalleryState } from "../lib/gallery-state.js";
+
+function parseRequestBody(request) {
+  return typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
+}
+
+function parseDataUrl(dataUrl) {
+  const match = String(dataUrl || "").match(/^data:(.+);base64,(.+)$/);
+  if (!match) {
+    throw new Error("Invalid image payload.");
+  }
+
+  return {
+    contentType: match[1],
+    buffer: Buffer.from(match[2], "base64")
+  };
+}
+
+function sanitizeFilename(filename) {
+  return String(filename || "upload.jpg")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+export default async function handler(request, response) {
+  if (request.method !== "POST") {
+    response.setHeader("Allow", "POST");
+    return response.status(405).json({ error: "Method not allowed." });
+  }
+
+  try {
+    const body = parseRequestBody(request);
+    const title = String(body?.title || "").trim();
+    const collectionId = String(body?.collectionId || "").trim();
+    const note = String(body?.note || "").trim();
+    const tags = Array.isArray(body?.tags) ? body.tags : [];
+    const filename = sanitizeFilename(body?.filename);
+
+    if (!title || !collectionId || !body?.dataUrl) {
+      return response.status(400).json({
+        error: "Title, collection, and image payload are required."
+      });
+    }
+
+    const { contentType, buffer } = parseDataUrl(body.dataUrl);
+    const blob = await put(`gallery-art/${Date.now()}-${filename}`, buffer, {
+      access: "public",
+      addRandomSuffix: true,
+      contentType
+    });
+
+    const photo = createPhotoRecord({
+      title,
+      note,
+      collectionId,
+      tags,
+      image: blob.url
+    });
+
+    const state = await updateGalleryState((currentState) => {
+      const collections = currentState.collections.map((collection) =>
+        collection.id === photo.collectionId
+          ? { ...collection, updatedAt: formatShortDate() }
+          : collection
+      );
+
+      return {
+        ...currentState,
+        collections,
+        photos: [photo, ...currentState.photos]
+      };
+    });
+
+    return response.status(200).json({ photo, state });
+  } catch (error) {
+    console.error("Failed to upload photo:", error);
+    return response.status(500).json({
+      error: error.message || "Photo upload failed."
+    });
+  }
+}

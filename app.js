@@ -135,15 +135,6 @@ function buildFallbackState() {
   };
 }
 
-let blobClientPromise;
-
-async function loadBlobClient() {
-  if (!blobClientPromise) {
-    blobClientPromise = import("https://esm.sh/@vercel/blob/client");
-  }
-  return blobClientPromise;
-}
-
 async function fetchGalleryState() {
   const response = await fetch("./api/gallery-state", {
     headers: { Accept: "application/json" },
@@ -188,6 +179,15 @@ function createUploadedCard(photo, collections) {
     <div class="item-tags">${(photo.tags || []).map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
   `;
   return card;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error(`Could not read ${file.name}.`));
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.readAsDataURL(file);
+  });
 }
 
 function setupGallery() {
@@ -454,30 +454,20 @@ function setupGallery() {
       refreshGalleryStatus("Uploading references to permanent storage...");
 
       try {
-        const { upload } = await loadBlobClient();
         const savedPhotos = [];
         for (const [index, file] of files.entries()) {
           const title = titleInput.value.trim()
             ? `${titleInput.value.trim()} ${index + 1}`
             : file.name.replace(/\.[^.]+$/, "");
+          const dataUrl = await readFileAsDataUrl(file);
 
-          const blob = await upload(`gallery-art/${Date.now()}-${file.name}`, file, {
-            access: "public",
-            handleUploadUrl: "/api/upload",
-            clientPayload: JSON.stringify({
-              title,
-              note: noteInput.value.trim() || "Uploaded personal reference.",
-              collectionId,
-              tags: tags.length ? tags : ["uploaded", "personal-reference"]
-            })
-          });
-
-          const photoResult = await postJson("./api/photos", {
+          const photoResult = await postJson("./api/uploads", {
             title,
             note: noteInput.value.trim() || "Uploaded personal reference.",
             collectionId,
             tags: tags.length ? tags : ["uploaded", "personal-reference"],
-            image: blob.url
+            filename: file.name,
+            dataUrl
           });
 
           savedPhotos.push(photoResult.photo);
