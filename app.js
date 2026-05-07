@@ -544,7 +544,9 @@ function setupGallery() {
         const savedPhotos = [];
         for (const [index, file] of files.entries()) {
           const title = titleInput.value.trim()
-            ? `${titleInput.value.trim()} ${index + 1}`
+            ? files.length > 1
+              ? `${titleInput.value.trim()} ${index + 1}`
+              : titleInput.value.trim()
             : file.name.replace(/\.[^.]+$/, "");
           const dataUrl = await compressImageFile(file);
 
