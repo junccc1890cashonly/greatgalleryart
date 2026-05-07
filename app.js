@@ -504,6 +504,9 @@ function setupGallery() {
     });
   }
 
+  renderCollectionOptions();
+  renderCollectionList();
+  renderUploadedPhotos();
   renderFilter("all");
   renderSelection();
   syncRemoteState({
