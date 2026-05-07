@@ -162,6 +162,9 @@ function setupGallery() {
   const filterButtons = document.querySelectorAll("[data-filter]");
   const collectionList = document.querySelector(".js-collection-list");
   const galleryGrid = document.querySelector(".gallery-grid");
+  const uploadedGrid = document.querySelector(".js-uploaded-grid");
+  const uploadedSection = document.querySelector(".js-uploaded-section");
+  const uploadedCount = document.querySelector(".js-uploaded-count");
   const uploadModal = document.querySelector(".js-upload-modal");
   const collectionModal = document.querySelector(".js-collection-modal");
   const uploadForm = document.querySelector(".js-upload-form");
@@ -184,8 +187,19 @@ function setupGallery() {
       <div class="item-tags">${photo.tags.map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
     `;
     attachSelectionHandler(card);
-    galleryGrid.prepend(card);
+    if (uploadedGrid) {
+      uploadedGrid.prepend(card);
+    } else {
+      galleryGrid.prepend(card);
+    }
     return card;
+  }
+
+  function renderUploadedVisibility() {
+    if (!uploadedSection || !uploadedCount) return;
+    const count = uploadedGrid ? uploadedGrid.children.length : 0;
+    uploadedSection.classList.toggle("is-visible", count > 0);
+    uploadedCount.textContent = `${count} upload${count === 1 ? "" : "s"} in this browser session`;
   }
 
   function refreshGalleryStatus(message) {
@@ -200,6 +214,7 @@ function setupGallery() {
         createUserPhotoCard(photo);
       }
     });
+    renderUploadedVisibility();
   }
 
   function renderCollectionOptions() {
@@ -412,18 +427,25 @@ function setupGallery() {
           writeSessionUploads(sessionUploads);
         } catch (error) {
           console.error("Upload persistence failed:", error);
-          status.textContent = "Upload is too large for browser storage. Try a smaller image.";
-          refreshGalleryStatus("Upload failed because the browser storage limit was reached.");
+          successfulPhotos.slice().reverse().forEach((photo) => createUserPhotoCard(photo));
+          renderUploadedVisibility();
+          renderSelection();
+          renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
+          closeModal(uploadModal);
+          uploadForm.reset();
+          status.textContent = "Saved for this page view only. Browser storage limit was reached.";
+          refreshGalleryStatus("Upload previewed, but it could not be stored permanently in this browser.");
           return;
         }
 
         successfulPhotos.slice().reverse().forEach((photo) => createUserPhotoCard(photo));
+        renderUploadedVisibility();
         renderSelection();
         renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
         refreshGalleryStatus(`${successfulPhotos.length} photo${successfulPhotos.length > 1 ? "s" : ""} added to your gallery.`);
-        status.textContent = "Upload complete.";
-        uploadForm.reset();
         closeModal(uploadModal);
+        uploadForm.reset();
+        status.textContent = "Upload complete.";
       }).catch((error) => {
         console.error("Upload failed:", error);
         status.textContent = "Something went wrong while saving the upload.";
