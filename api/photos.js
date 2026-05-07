@@ -43,7 +43,7 @@ export default async function handler(request, response) {
   } catch (error) {
     console.error("Failed to save photo metadata:", error);
     return response.status(500).json({
-      error: "Photo metadata could not be saved."
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 }
