@@ -195,6 +195,35 @@ function readFileAsDataUrl(file) {
   });
 }
 
+function loadImage(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Could not process this image."));
+    image.src = dataUrl;
+  });
+}
+
+async function compressImageFile(file) {
+  const originalDataUrl = await readFileAsDataUrl(file);
+  const image = await loadImage(originalDataUrl);
+  const maxDimension = 1600;
+  const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return originalDataUrl;
+  }
+
+  context.drawImage(image, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", 0.82);
+}
+
 function setupGallery() {
   const items = Array.from(document.querySelectorAll(".gallery-item[data-photo-id]"));
   if (!items.length) return;
@@ -464,7 +493,7 @@ function setupGallery() {
           const title = titleInput.value.trim()
             ? `${titleInput.value.trim()} ${index + 1}`
             : file.name.replace(/\.[^.]+$/, "");
-          const dataUrl = await readFileAsDataUrl(file);
+          const dataUrl = await compressImageFile(file);
 
           const photoResult = await postJson("./api/uploads", {
             title,
