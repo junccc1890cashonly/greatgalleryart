@@ -190,17 +190,6 @@ function createUploadedCard(photo, collections) {
   return card;
 }
 
-async function waitForState(check, attempts = 6, delay = 400) {
-  for (let index = 0; index < attempts; index += 1) {
-    const state = await fetchGalleryState();
-    if (check(state)) {
-      return state;
-    }
-    await new Promise((resolve) => window.setTimeout(resolve, delay));
-  }
-  return fetchGalleryState();
-}
-
 function setupGallery() {
   const items = Array.from(document.querySelectorAll(".gallery-item[data-photo-id]"));
   if (!items.length) return;
@@ -466,12 +455,13 @@ function setupGallery() {
 
       try {
         const { upload } = await loadBlobClient();
+        const savedPhotos = [];
         for (const [index, file] of files.entries()) {
           const title = titleInput.value.trim()
             ? `${titleInput.value.trim()} ${index + 1}`
             : file.name.replace(/\.[^.]+$/, "");
 
-          await upload(`gallery-art/${Date.now()}-${file.name}`, file, {
+          const blob = await upload(`gallery-art/${Date.now()}-${file.name}`, file, {
             access: "public",
             handleUploadUrl: "/api/upload",
             clientPayload: JSON.stringify({
@@ -481,21 +471,29 @@ function setupGallery() {
               tags: tags.length ? tags : ["uploaded", "personal-reference"]
             })
           });
+
+          const photoResult = await postJson("./api/photos", {
+            title,
+            note: noteInput.value.trim() || "Uploaded personal reference.",
+            collectionId,
+            tags: tags.length ? tags : ["uploaded", "personal-reference"],
+            image: blob.url
+          });
+
+          savedPhotos.push(photoResult.photo);
         }
 
         writeActiveCollection(collectionId);
-        remoteState = await waitForState(
-          (state) => (state.photos || []).length >= (remoteState.photos || []).length + files.length
-        );
+        remoteState = await fetchGalleryState();
+        closeModal(uploadModal);
+        uploadForm.reset();
+        status.textContent = "Upload complete.";
         renderCollectionOptions();
         renderCollectionList();
         renderUploadedPhotos();
         renderSelection();
         renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
-        closeModal(uploadModal);
-        uploadForm.reset();
-        status.textContent = "Upload complete.";
-        refreshGalleryStatus(`${files.length} photo${files.length > 1 ? "s" : ""} added to your gallery.`);
+        refreshGalleryStatus(`${savedPhotos.length} photo${savedPhotos.length > 1 ? "s" : ""} added to your gallery.`);
       } catch (error) {
         console.error("Upload failed:", error);
         status.textContent = error.message || "Something went wrong while saving the upload.";

@@ -1,5 +1,4 @@
 import { handleUpload } from "@vercel/blob/client";
-import { createPhotoRecord, formatShortDate, updateGalleryState } from "../lib/gallery-state.js";
 
 function parseClientPayload(clientPayload) {
   if (!clientPayload) {
@@ -41,29 +40,7 @@ export default async function handler(request, response) {
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        const payload = JSON.parse(tokenPayload || "{}");
-        const photo = createPhotoRecord({
-          id: `upload-${Date.now()}`,
-          title: payload.title,
-          note: payload.note,
-          collectionId: payload.collectionId,
-          tags: payload.tags,
-          image: blob.url
-        });
-
-        await updateGalleryState((currentState) => {
-          const collections = currentState.collections.map((collection) =>
-            collection.id === photo.collectionId
-              ? { ...collection, updatedAt: formatShortDate() }
-              : collection
-          );
-
-          return {
-            ...currentState,
-            collections,
-            photos: [photo, ...currentState.photos]
-          };
-        });
+        console.log("Blob upload completed", blob.url, tokenPayload);
       }
     });
 
