@@ -609,9 +609,34 @@ function setupPromptStudio() {
   const cards = Array.from(document.querySelectorAll(".selection-card"));
   const refreshButton = document.querySelector(".js-refresh-selection");
   const toggles = document.querySelectorAll("[data-target]");
+  const directionInput = document.querySelector(".js-creative-direction");
+  const generateButton = document.querySelector(".js-generate-prompt");
+  const generateStatus = document.querySelector(".js-generate-status");
+  const styleSummaryText = document.querySelector(".js-style-summary-text");
+  const hashtagBank = document.querySelector(".js-tag-bank");
+  const lovartPromptText = document.querySelector(".js-lovart-prompt-text");
+  let promptStudioState = buildFallbackState();
+
+  function setGenerateStatus(message) {
+    if (generateStatus) {
+      generateStatus.textContent = message;
+    }
+  }
+
+  function getSelectedPhotos() {
+    const selectedSet = new Set(selection);
+    const selectedPhotos = (promptStudioState.photos || []).filter((photo) => selectedSet.has(photo.id));
+    if (selectedPhotos.length) {
+      return selection
+        .map((id) => selectedPhotos.find((photo) => photo.id === id))
+        .filter(Boolean);
+    }
+    return (promptStudioState.photos || []).slice(0, 4);
+  }
 
   function renderSelection() {
-    const count = selection.length || 4;
+    const selectedPhotos = getSelectedPhotos();
+    const count = selectedPhotos.length || 4;
     countTarget.textContent = formatCount(count);
     if (helper) {
       helper.textContent =
@@ -624,9 +649,13 @@ function setupPromptStudio() {
         selection.length > 0 ? "Gallery selection synced" : "Quiet Luxury / Interior Silence";
     }
     cards.forEach((card, index) => {
-      const active = index < count;
+      const photo = selectedPhotos[index];
+      const active = Boolean(photo);
       card.classList.toggle("is-active", active);
       card.classList.toggle("is-muted", !active);
+      if (photo?.image) {
+        card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
+      }
     });
   }
 
@@ -649,13 +678,61 @@ function setupPromptStudio() {
   });
 
   if (refreshButton) {
-    refreshButton.addEventListener("click", () => {
+    refreshButton.addEventListener("click", async () => {
       selection = readSelection();
+      try {
+        promptStudioState = await fetchGalleryState();
+      } catch (error) {
+        console.error("Could not refresh prompt studio state:", error);
+      }
       renderSelection();
     });
   }
 
-  renderSelection();
+  if (generateButton) {
+    generateButton.addEventListener("click", async () => {
+      generateButton.disabled = true;
+      setGenerateStatus("Generating prompt with OpenAI...");
+      try {
+        const result = await postJson("./api/generate-prompt", {
+          selectedIds: selection,
+          creativeDirection: directionInput ? directionInput.value : ""
+        });
+
+        if (styleSummaryText) {
+          styleSummaryText.textContent = result.styleSummary || "No style summary returned.";
+        }
+        if (hashtagBank) {
+          hashtagBank.innerHTML = (result.hashtags || [])
+            .map((tag) => `<span class="tag">${tag.startsWith("#") ? tag : `#${tag}`}</span>`)
+            .join("");
+        }
+        if (lovartPromptText) {
+          lovartPromptText.textContent = result.lovartPrompt || "No prompt returned.";
+        }
+        if (countTarget && result.selectedCount) {
+          countTarget.textContent = formatCount(result.selectedCount);
+        }
+        setGenerateStatus("Prompt generated with OpenAI.");
+      } catch (error) {
+        console.error("Prompt generation failed:", error);
+        setGenerateStatus(error.message || "Prompt generation failed.");
+      } finally {
+        generateButton.disabled = false;
+      }
+    });
+  }
+
+  fetchGalleryState()
+    .then((state) => {
+      promptStudioState = state;
+      renderSelection();
+    })
+    .catch((error) => {
+      console.error("Could not load prompt studio state:", error);
+      renderSelection();
+      setGenerateStatus("Using fallback references until gallery data loads.");
+    });
 }
 
 function setupArchive() {
