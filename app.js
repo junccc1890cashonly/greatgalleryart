@@ -188,6 +188,12 @@ function setupGallery() {
     return card;
   }
 
+  function refreshGalleryStatus(message) {
+    if (galleryStatus) {
+      galleryStatus.textContent = message;
+    }
+  }
+
   function renderSessionUploads() {
     sessionUploads.forEach((photo) => {
       if (!document.querySelector(`[data-photo-id="${photo.id}"]`)) {
@@ -334,9 +340,7 @@ function setupGallery() {
       writeData(COLLECTION_STORAGE_KEY, collections);
       renderCollectionOptions();
       renderCollectionList();
-      if (galleryStatus) {
-        galleryStatus.textContent = `${name} created and ready for uploads.`;
-      }
+      refreshGalleryStatus(`${name} created and ready for uploads.`);
       status.textContent = "Collection created.";
       collectionForm.reset();
       closeModal(collectionModal);
@@ -366,6 +370,9 @@ function setupGallery() {
       Promise.all(
         files.map((file, index) => new Promise((resolve) => {
           const reader = new FileReader();
+          reader.onerror = () => {
+            resolve(null);
+          };
           reader.onload = () => {
             const title = titleInput.value.trim()
               ? `${titleInput.value.trim()} ${index + 1}`
@@ -382,7 +389,13 @@ function setupGallery() {
           reader.readAsDataURL(file);
         }))
       ).then((photos) => {
-        const lightweightPhotos = photos.map((photo) => ({
+        const successfulPhotos = photos.filter(Boolean);
+        if (!successfulPhotos.length) {
+          status.textContent = "Images could not be read. Please try a different file.";
+          return;
+        }
+
+        const lightweightPhotos = successfulPhotos.map((photo) => ({
           id: photo.id,
           title: photo.title,
           note: photo.note,
@@ -392,7 +405,7 @@ function setupGallery() {
         }));
 
         savedPhotos = [...lightweightPhotos, ...savedPhotos];
-        sessionUploads = [...photos, ...sessionUploads];
+        sessionUploads = [...successfulPhotos, ...sessionUploads];
 
         try {
           writeData(PHOTO_STORAGE_KEY, savedPhotos);
@@ -400,18 +413,21 @@ function setupGallery() {
         } catch (error) {
           console.error("Upload persistence failed:", error);
           status.textContent = "Upload is too large for browser storage. Try a smaller image.";
+          refreshGalleryStatus("Upload failed because the browser storage limit was reached.");
           return;
         }
 
-        photos.reverse().forEach((photo) => createUserPhotoCard(photo));
+        successfulPhotos.slice().reverse().forEach((photo) => createUserPhotoCard(photo));
         renderSelection();
         renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
-        if (galleryStatus) {
-          galleryStatus.textContent = `${photos.length} photo${photos.length > 1 ? "s" : ""} added to your gallery.`;
-        }
+        refreshGalleryStatus(`${successfulPhotos.length} photo${successfulPhotos.length > 1 ? "s" : ""} added to your gallery.`);
         status.textContent = "Upload complete.";
         uploadForm.reset();
         closeModal(uploadModal);
+      }).catch((error) => {
+        console.error("Upload failed:", error);
+        status.textContent = "Something went wrong while saving the upload.";
+        refreshGalleryStatus("Upload did not finish. Please try again.");
       });
     });
   }
