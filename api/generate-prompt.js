@@ -31,6 +31,7 @@ export default async function handler(request, response) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
   if (!apiKey) {
     return response.status(500).json({ error: "OPENAI_API_KEY is missing in this Vercel project." });
   }
@@ -82,7 +83,7 @@ export default async function handler(request, response) {
         Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-5-mini",
+        model,
         input: [
           {
             role: "system",
@@ -108,7 +109,23 @@ export default async function handler(request, response) {
 
     const rawText = await openaiResponse.text();
     if (!openaiResponse.ok) {
-      return response.status(openaiResponse.status).json({ error: rawText || "OpenAI request failed." });
+      let friendlyError = rawText || "OpenAI request failed.";
+      try {
+        const parsedError = JSON.parse(rawText);
+        const message = parsedError?.error?.message || "";
+        const code = parsedError?.error?.code || "";
+        if (code === "model_not_found" && message.includes("verified")) {
+          friendlyError =
+            `The model "${model}" is not available for this organization yet. ` +
+            `Either verify your OpenAI organization in Settings > Organization > General, ` +
+            `or switch OPENAI_MODEL to a model your account can access, such as gpt-4.1-mini.`;
+        } else if (message) {
+          friendlyError = message;
+        }
+      } catch {
+        // Keep rawText when OpenAI does not return JSON.
+      }
+      return response.status(openaiResponse.status).json({ error: friendlyError });
     }
 
     const parsedResponse = JSON.parse(rawText);
