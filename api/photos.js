@@ -1,9 +1,11 @@
 import { del } from "@vercel/blob";
 import { createPhotoRecord, formatShortDate, updateGalleryState } from "../lib/gallery-state.js";
+import { AuthError, requireAuthenticatedRequest } from "../lib/supabase-auth.js";
 
 export default async function handler(request, response) {
   if (request.method === "POST") {
     try {
+      await requireAuthenticatedRequest(request);
       const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
       const collectionId = String(body?.collectionId || "").trim();
       const image = String(body?.image || "").trim();
@@ -39,7 +41,8 @@ export default async function handler(request, response) {
       return response.status(200).json({ photo, state });
     } catch (error) {
       console.error("Failed to save photo metadata:", error);
-      return response.status(500).json({
+      const status = error instanceof AuthError ? error.status : 500;
+      return response.status(status).json({
         error: error instanceof Error ? error.message : String(error)
       });
     }
@@ -47,6 +50,7 @@ export default async function handler(request, response) {
 
   if (request.method === "DELETE") {
     try {
+      await requireAuthenticatedRequest(request);
       const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
       const photoId = String(body?.id || "").trim();
 
@@ -73,7 +77,8 @@ export default async function handler(request, response) {
       return response.status(200).json({ state });
     } catch (error) {
       console.error("Failed to delete photo metadata:", error);
-      return response.status(500).json({
+      const status = error instanceof AuthError ? error.status : 500;
+      return response.status(status).json({
         error: error instanceof Error ? error.message : String(error)
       });
     }

@@ -1,5 +1,12 @@
 const STORAGE_KEY = "galleryArtSelection";
 const ACTIVE_COLLECTION_KEY = "galleryArtActiveCollection";
+let authConfigPromise;
+let supabaseClientPromise;
+let currentSession = null;
+let authReadyResolve;
+const authReady = new Promise((resolve) => {
+  authReadyResolve = resolve;
+});
 
 const DEFAULT_COLLECTIONS = [
   {
@@ -157,6 +164,61 @@ async function fetchGalleryState() {
   return response.json();
 }
 
+async function fetchAuthConfig() {
+  if (!authConfigPromise) {
+    authConfigPromise = fetch("./api/auth-config", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    }).then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Supabase auth config could not be loaded.");
+      }
+      return data;
+    });
+  }
+  return authConfigPromise;
+}
+
+async function getSupabaseClient() {
+  if (!supabaseClientPromise) {
+    supabaseClientPromise = Promise.all([
+      import("https://esm.sh/@supabase/supabase-js@2"),
+      fetchAuthConfig()
+    ]).then(([module, config]) => {
+      const client = module.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+      return client;
+    });
+  }
+  return supabaseClientPromise;
+}
+
+function getCurrentUserEmail() {
+  return currentSession?.user?.email || "";
+}
+
+function setCurrentSession(session) {
+  currentSession = session || null;
+  document.querySelectorAll(".js-auth-label").forEach((node) => {
+    node.textContent = currentSession ? getCurrentUserEmail() : "Sign In";
+  });
+  document.querySelectorAll(".js-auth-caption").forEach((node) => {
+    node.textContent = currentSession ? "Signed in" : "Guests can browse, but actions require sign in.";
+  });
+  document.querySelectorAll(".js-auth-signout").forEach((node) => {
+    node.hidden = !currentSession;
+  });
+  document.querySelectorAll(".js-auth-signin").forEach((node) => {
+    node.hidden = Boolean(currentSession);
+  });
+}
+
 async function postJson(url, payload) {
   return requestJson(url, "POST", payload);
 }
@@ -166,12 +228,18 @@ async function deleteJson(url, payload) {
 }
 
 async function requestJson(url, method, payload) {
+  await authReady;
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json"
+  };
+  if (currentSession?.access_token) {
+    headers.Authorization = `Bearer ${currentSession.access_token}`;
+  }
+
   const response = await fetch(url, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json"
-    },
+    headers,
     body: JSON.stringify(payload)
   });
 
@@ -193,6 +261,286 @@ async function requestJson(url, method, payload) {
     throw new Error(message);
   }
   return data;
+}
+
+function ensureAuthUi() {
+  if (document.querySelector(".js-auth-shell")) return;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .auth-shell {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 18px;
+      flex-wrap: wrap;
+    }
+    .auth-trigger,
+    .auth-signout {
+      border: 1px solid rgba(44, 39, 34, 0.12);
+      background: rgba(255, 255, 255, 0.54);
+      color: #72695f;
+      padding: 9px 12px;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .auth-copy {
+      display: grid;
+      gap: 2px;
+    }
+    .auth-copy strong {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 400;
+      color: #1d1a17;
+    }
+    .auth-copy span {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #a79c90;
+    }
+    .js-auth-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(24, 21, 18, 0.38);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 30;
+    }
+    .js-auth-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .js-auth-modal .modal-card {
+      width: min(520px, 100%);
+      padding: 20px;
+      border: 1px solid rgba(44, 39, 34, 0.12);
+      background: rgba(255, 251, 245, 0.96);
+      box-shadow: 0 24px 60px rgba(37, 30, 24, 0.18);
+    }
+    .js-auth-modal .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .js-auth-modal .modal-head h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #1d1a17;
+    }
+    .js-auth-modal .modal-close {
+      border: 0;
+      background: transparent;
+      color: #72695f;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .auth-modal-card {
+      width: min(460px, 100%);
+    }
+    .auth-note {
+      margin: 0 0 16px;
+      color: #72695f;
+      line-height: 1.8;
+    }
+    .js-auth-modal .form-stack {
+      display: grid;
+      gap: 14px;
+    }
+    .js-auth-modal .field-label {
+      display: grid;
+      gap: 8px;
+      color: #72695f;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .js-auth-modal .input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(44, 39, 34, 0.12);
+      background: rgba(255, 255, 255, 0.7);
+      color: #1d1a17;
+      font: inherit;
+    }
+    .js-auth-modal .inline-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .js-auth-modal .status-message {
+      color: #72695f;
+      line-height: 1.7;
+      flex: 1 1 220px;
+    }
+    .js-auth-modal .action.primary {
+      border: 1px solid rgba(85, 107, 95, 0.16);
+      background: rgba(85, 107, 95, 0.14);
+      color: #556b5f;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    @media (max-width: 720px) {
+      .auth-shell {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+      }
+    }
+  `;
+  document.head.append(style);
+
+  document.querySelectorAll(".nav").forEach((nav) => {
+    const shell = document.createElement("div");
+    shell.className = "auth-shell js-auth-shell";
+    shell.innerHTML = `
+      <button class="auth-trigger js-auth-signin" type="button">Sign In</button>
+      <div class="auth-copy">
+        <strong class="js-auth-label">Sign In</strong>
+        <span class="js-auth-caption">Guests can browse, but actions require sign in.</span>
+      </div>
+      <button class="auth-signout js-auth-signout" type="button" hidden>Sign Out</button>
+    `;
+    nav.append(shell);
+  });
+
+  const modal = document.createElement("div");
+  modal.className = "modal js-auth-modal";
+  modal.setAttribute("aria-hidden", "true");
+  modal.innerHTML = `
+    <div class="modal-card auth-modal-card">
+      <div class="modal-head">
+        <h3>Sign In To Continue</h3>
+        <button class="modal-close js-close-auth-modal" type="button">×</button>
+      </div>
+      <p class="auth-note">Use a magic link to sign in. Uploading, collection creation, prompt generation, and deletion require an authenticated session.</p>
+      <form class="form-stack js-auth-form">
+        <label class="field-label">
+          Email address
+          <input class="input js-auth-email" type="email" placeholder="you@example.com" required />
+        </label>
+        <div class="inline-actions">
+          <div class="status-message js-auth-status">We will send a one-time sign-in link to your inbox.</div>
+          <button class="action primary" type="submit">Send Magic Link</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.append(modal);
+}
+
+function openAuthModal() {
+  const modal = document.querySelector(".js-auth-modal");
+  if (!modal) return;
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeAuthModal() {
+  const modal = document.querySelector(".js-auth-modal");
+  if (!modal) return;
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function requireSignedIn() {
+  await authReady;
+  if (currentSession?.access_token) {
+    return true;
+  }
+  openAuthModal();
+  throw new Error("Please sign in first.");
+}
+
+async function setupAuth() {
+  ensureAuthUi();
+
+  document.querySelectorAll(".js-auth-signin").forEach((button) => {
+    button.addEventListener("click", () => openAuthModal());
+  });
+  document.querySelectorAll(".js-close-auth-modal").forEach((button) => {
+    button.addEventListener("click", () => closeAuthModal());
+  });
+  document.querySelectorAll(".js-auth-signout").forEach((button) => {
+    button.addEventListener("click", async () => {
+      try {
+        const supabase = await getSupabaseClient();
+        await supabase.auth.signOut();
+        setCurrentSession(null);
+      } catch (error) {
+        console.error("Sign-out failed:", error);
+      }
+    });
+  });
+
+  const authForm = document.querySelector(".js-auth-form");
+  if (authForm) {
+    authForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const emailInput = authForm.querySelector(".js-auth-email");
+      const status = authForm.querySelector(".js-auth-status");
+      const email = String(emailInput.value || "").trim();
+      if (!email) {
+        status.textContent = "Please enter your email address.";
+        return;
+      }
+
+      status.textContent = "Sending magic link...";
+      try {
+        const supabase = await getSupabaseClient();
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`
+          }
+        });
+        if (error) {
+          throw error;
+        }
+        status.textContent = "Magic link sent. Check your inbox and return here after signing in.";
+      } catch (error) {
+        console.error("Magic link failed:", error);
+        status.textContent = error.message || "Could not send the magic link.";
+      }
+    });
+  }
+
+  try {
+    const supabase = await getSupabaseClient();
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+    setCurrentSession(session);
+
+    supabase.auth.onAuthStateChange((_event, sessionValue) => {
+      setCurrentSession(sessionValue);
+      if (sessionValue) {
+        closeAuthModal();
+      }
+    });
+  } catch (error) {
+    console.error("Auth setup failed:", error);
+    document.querySelectorAll(".js-auth-caption").forEach((node) => {
+      node.textContent = "Supabase auth is not configured yet.";
+    });
+  } finally {
+    authReadyResolve();
+  }
 }
 
 function createUploadedCard(photo, collections) {
@@ -402,6 +750,7 @@ function setupGallery() {
             event.stopPropagation();
             deleteButton.disabled = true;
             try {
+              await requireSignedIn();
               const result = await deleteJson("./api/photos", { id: photo.id });
               remoteState = result.state;
               renderCollectionOptions();
@@ -412,6 +761,7 @@ function setupGallery() {
             } catch (error) {
               console.error("Delete failed:", error);
               refreshGalleryStatus(error.message || "Photo could not be deleted.");
+            } finally {
               deleteButton.disabled = false;
             }
           });
@@ -447,22 +797,46 @@ function setupGallery() {
   });
 
   promptLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
+    link.addEventListener("click", async (event) => {
       if (selection.length === 0) {
         event.preventDefault();
         if (summary) {
           summary.textContent = "Select at least one image before opening Prompt Studio.";
+        }
+        return;
+      }
+
+      try {
+        await requireSignedIn();
+      } catch {
+        event.preventDefault();
+        if (summary) {
+          summary.textContent = "Sign in to continue into Prompt Studio.";
         }
       }
     });
   });
 
   document.querySelectorAll(".js-open-upload").forEach((button) => {
-    button.addEventListener("click", () => openModal(uploadModal));
+    button.addEventListener("click", async () => {
+      try {
+        await requireSignedIn();
+        openModal(uploadModal);
+      } catch {
+        refreshGalleryStatus("Sign in to upload new references.");
+      }
+    });
   });
 
   document.querySelectorAll(".js-open-collection-modal").forEach((button) => {
-    button.addEventListener("click", () => openModal(collectionModal));
+    button.addEventListener("click", async () => {
+      try {
+        await requireSignedIn();
+        openModal(collectionModal);
+      } catch {
+        refreshGalleryStatus("Sign in to create a collection.");
+      }
+    });
   });
 
   document.querySelectorAll(".js-close-modal").forEach((button) => {
@@ -475,6 +849,11 @@ function setupGallery() {
   if (collectionForm) {
     collectionForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      try {
+        await requireSignedIn();
+      } catch {
+        return;
+      }
       const nameInput = collectionForm.querySelector(".js-collection-name");
       const descriptionInput = collectionForm.querySelector(".js-collection-description");
       const tagsInput = collectionForm.querySelector(".js-collection-tags");
@@ -517,6 +896,11 @@ function setupGallery() {
   if (uploadForm) {
     uploadForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      try {
+        await requireSignedIn();
+      } catch {
+        return;
+      }
       const fileInput = uploadForm.querySelector('input[type="file"]');
       const titleInput = uploadForm.querySelector(".js-upload-title");
       const noteInput = uploadForm.querySelector(".js-upload-note");
@@ -691,6 +1075,12 @@ function setupPromptStudio() {
 
   if (generateButton) {
     generateButton.addEventListener("click", async () => {
+      try {
+        await requireSignedIn();
+      } catch {
+        setGenerateStatus("Sign in to generate prompts with OpenAI.");
+        return;
+      }
       generateButton.disabled = true;
       setGenerateStatus("Generating prompt with OpenAI...");
       try {
@@ -841,6 +1231,7 @@ async function setupCollectionPage() {
   }
 }
 
+setupAuth();
 setupGallery();
 setupPromptStudio();
 setupArchive();

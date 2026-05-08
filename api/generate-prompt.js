@@ -1,4 +1,5 @@
 import { getGalleryState } from "../lib/gallery-state.js";
+import { AuthError, requireAuthenticatedRequest } from "../lib/supabase-auth.js";
 
 function buildSelectedPhotos(state, selectedIds) {
   const selectedSet = new Set(selectedIds);
@@ -53,6 +54,7 @@ export default async function handler(request, response) {
   }
 
   try {
+    await requireAuthenticatedRequest(request);
     const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
     const selectedIds = Array.isArray(body.selectedIds) ? body.selectedIds.map(String) : [];
     const creativeDirection = String(body.creativeDirection || "").trim();
@@ -159,7 +161,8 @@ export default async function handler(request, response) {
     });
   } catch (error) {
     console.error("Prompt generation failed:", error);
-    return response.status(500).json({
+    const status = error instanceof AuthError ? error.status : 500;
+    return response.status(status).json({
       error: error instanceof Error ? error.message : String(error)
     });
   }
