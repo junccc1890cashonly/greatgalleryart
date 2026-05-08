@@ -24,6 +24,22 @@ function extractJson(text) {
   return JSON.parse(source.slice(firstBrace, lastBrace + 1));
 }
 
+function extractTextFromResponsePayload(payload) {
+  const outputs = Array.isArray(payload?.output) ? payload.output : [];
+  const textChunks = [];
+
+  outputs.forEach((entry) => {
+    const contents = Array.isArray(entry?.content) ? entry.content : [];
+    contents.forEach((content) => {
+      if (content?.type === "output_text" && content?.text) {
+        textChunks.push(content.text);
+      }
+    });
+  });
+
+  return textChunks.join("\n").trim();
+}
+
 export default async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
@@ -102,6 +118,9 @@ export default async function handler(request, response) {
           }
         ],
         text: {
+          format: {
+            type: "json_object"
+          },
           verbosity: "medium"
         }
       })
@@ -129,7 +148,7 @@ export default async function handler(request, response) {
     }
 
     const parsedResponse = JSON.parse(rawText);
-    const outputText = parsedResponse.output_text || "";
+    const outputText = parsedResponse.output_text || extractTextFromResponsePayload(parsedResponse);
     const promptPackage = extractJson(outputText);
 
     return response.status(200).json({
