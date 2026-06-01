@@ -1,5 +1,4 @@
 import { put } from "@vercel/blob";
-import { AuthError, requireAuthenticatedRequest } from "../lib/supabase-auth.js";
 
 export const config = {
   api: {
@@ -49,7 +48,6 @@ export default async function handler(request, response) {
   }
 
   try {
-    await requireAuthenticatedRequest(request);
     const body = parseRequestBody(request);
     const title = String(body?.title || "").trim();
     const collectionId = String(body?.collectionId || "").trim();
@@ -76,8 +74,7 @@ export default async function handler(request, response) {
     return response.status(200).json({ url: blob.url });
   } catch (error) {
     console.error("Failed to upload photo:", error);
-    const status = error instanceof AuthError ? error.status : 500;
-    return response.status(status).json({
+    return response.status(500).json({
       error: error.message || "Photo upload failed."
     });
   }

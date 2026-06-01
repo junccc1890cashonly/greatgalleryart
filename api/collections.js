@@ -1,5 +1,4 @@
 import { createCollectionRecord, updateGalleryState } from "../lib/gallery-state.js";
-import { AuthError, requireAuthenticatedRequest } from "../lib/supabase-auth.js";
 
 export default async function handler(request, response) {
   if (request.method !== "POST") {
@@ -8,7 +7,6 @@ export default async function handler(request, response) {
   }
 
   try {
-    await requireAuthenticatedRequest(request);
     const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
     const name = String(body?.name || "").trim();
 
@@ -30,12 +28,8 @@ export default async function handler(request, response) {
     return response.status(200).json({ collection, state });
   } catch (error) {
     console.error("Failed to create collection:", error);
-    const status = error instanceof AuthError ? error.status : 500;
-    return response.status(status).json({
-      error:
-        error instanceof AuthError || error instanceof Error
-          ? error.message
-          : "Collection could not be created. Check that Vercel Blob is connected to this project."
+    return response.status(500).json({
+      error: "Collection could not be created. Check that Vercel Blob is connected to this project."
     });
   }
 }
