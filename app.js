@@ -279,6 +279,11 @@ function setupGallery() {
   let selection = readSelection();
   let remoteState = buildFallbackState();
 
+  function normalizeSelection() {
+    const validIds = new Set((remoteState.photos || []).map((photo) => photo.id));
+    selection = selection.filter((id) => validIds.has(id));
+  }
+
   function openModal(modal) {
     if (!modal) return;
     modal.classList.add("is-open");
@@ -311,25 +316,27 @@ function setupGallery() {
   }
 
   function renderSelection() {
+    normalizeSelection();
     const allItems = Array.from(document.querySelectorAll(".gallery-item[data-photo-id]"));
+    const selectedCount = selection.length;
     allItems.forEach((item) => {
       const isSelected = selection.includes(item.dataset.photoId);
       item.classList.toggle("is-selected", isSelected);
     });
 
     countTargets.forEach((node) => {
-      node.textContent = selection.length;
+      node.textContent = selectedCount;
     });
 
     if (summary) {
       summary.textContent =
-        selection.length > 0
-          ? `${selection.length} references ready for Prompt Studio.`
+        selectedCount > 0
+          ? `${selectedCount} references ready for Prompt Studio.`
           : "Select references to prepare a Lovart prompt set.";
     }
 
     promptLinks.forEach((link) => {
-      const disabled = selection.length === 0;
+      const disabled = selectedCount === 0;
       link.classList.toggle("is-disabled", disabled);
       link.setAttribute("aria-disabled", String(disabled));
       link.textContent = disabled ? "Select References First" : "Open Prompt Studio";
@@ -448,6 +455,7 @@ function setupGallery() {
 
   promptLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
+      normalizeSelection();
       if (selection.length === 0) {
         event.preventDefault();
         if (summary) {
@@ -617,6 +625,11 @@ function setupPromptStudio() {
   const lovartPromptText = document.querySelector(".js-lovart-prompt-text");
   let promptStudioState = buildFallbackState();
 
+  function normalizeSelection() {
+    const validIds = new Set((promptStudioState.photos || []).map((photo) => photo.id));
+    selection = selection.filter((id) => validIds.has(id));
+  }
+
   function setGenerateStatus(message) {
     if (generateStatus) {
       generateStatus.textContent = message;
@@ -624,6 +637,7 @@ function setupPromptStudio() {
   }
 
   function getSelectedPhotos() {
+    normalizeSelection();
     const selectedSet = new Set(selection);
     const selectedPhotos = (promptStudioState.photos || []).filter((photo) => selectedSet.has(photo.id));
     if (selectedPhotos.length) {
@@ -637,16 +651,16 @@ function setupPromptStudio() {
   function renderSelection() {
     const selectedPhotos = getSelectedPhotos();
     const count = selectedPhotos.length || 4;
+    const selectedCount = selection.length;
     countTarget.textContent = formatCount(count);
     if (helper) {
       helper.textContent =
-        selection.length > 0
-          ? `${selection.length} references were carried over from Gallery selection.`
+        selectedCount > 0
+          ? `${selectedCount} references were carried over from Gallery selection.`
           : "No saved selection found. Using the current visual set as the default prompt references.";
     }
     if (label) {
-      label.textContent =
-        selection.length > 0 ? "Gallery selection synced" : "Quiet Luxury / Interior Silence";
+      label.textContent = selectedCount > 0 ? "Gallery selection synced" : "Quiet Luxury / Interior Silence";
     }
     cards.forEach((card, index) => {
       const photo = selectedPhotos[index];
