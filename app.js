@@ -809,7 +809,7 @@ async function setupCollectionPage() {
       .join("");
   }
   if (coverNode && collectionPhotos[0]?.image) {
-    coverNode.style.backgroundImage = `linear-gradient(180deg, rgba(255,255,255,0.06), rgba(24,21,18,0.18)), url("${collectionPhotos[0].image}")`;
+    coverNode.style.backgroundImage = `linear-gradient(180deg, rgba(255,255,255,0.06), rgba(24,21,18,0.18)), url("${getProxiedImageUrl(collectionPhotos[0].image)}")`;
   }
   if (gridNode) {
     if (!collectionPhotos.length) {
