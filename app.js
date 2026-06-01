@@ -766,6 +766,7 @@ async function setupCollectionPage() {
   const switcherNode = document.querySelector(".js-collection-switcher");
   const coverNode = document.querySelector(".js-collection-cover");
   const params = new URLSearchParams(window.location.search);
+  const loadingClass = "is-collection-loading";
 
   let state = buildFallbackState();
   try {
@@ -776,7 +777,10 @@ async function setupCollectionPage() {
 
   const selectedId = params.get("collection") || readActiveCollection();
   const collection = state.collections.find((item) => item.id === selectedId) || state.collections[0];
-  if (!collection) return;
+  if (!collection) {
+    document.body.classList.remove(loadingClass);
+    return;
+  }
 
   writeActiveCollection(collection.id);
   nameNode.textContent = collection.name;
@@ -839,6 +843,8 @@ async function setupCollectionPage() {
         .join("");
     }
   }
+
+  document.body.classList.remove(loadingClass);
 }
 
 setupGallery();

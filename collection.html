@@ -96,6 +96,11 @@
       .meta-row {
         transition: opacity 180ms ease;
       }
+      .is-collection-loading .hero,
+      .is-collection-loading .section,
+      .is-collection-loading .footer-note {
+        opacity: 0;
+      }
       .nav .current { color: var(--text); }
       .hero {
         align-items: stretch;
@@ -307,7 +312,7 @@
       }
     </style>
   </head>
-  <body>
+  <body class="is-collection-loading">
     <main class="page">
       <header class="topbar">
         <div class="brand">
