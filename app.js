@@ -693,13 +693,36 @@ function setupPromptStudio() {
 
   if (refreshButton) {
     refreshButton.addEventListener("click", async () => {
+      const previousSelection = [...selection];
+      const previousSelectedPhotos = getSelectedPhotos().map((photo) => photo.id);
+      const originalLabel = refreshButton.textContent;
+      refreshButton.disabled = true;
+      refreshButton.textContent = "Refreshing...";
+      setGenerateStatus("Refreshing selected references from Gallery...");
       selection = readSelection();
       try {
         promptStudioState = await fetchGalleryState();
       } catch (error) {
         console.error("Could not refresh prompt studio state:", error);
+        setGenerateStatus("Could not refresh selection. Using the latest saved state.");
+        refreshButton.disabled = false;
+        refreshButton.textContent = originalLabel;
+        renderSelection();
+        return;
       }
       renderSelection();
+      const nextSelectedPhotos = getSelectedPhotos().map((photo) => photo.id);
+      const selectionChanged =
+        previousSelection.join("|") !== selection.join("|") ||
+        previousSelectedPhotos.join("|") !== nextSelectedPhotos.join("|");
+
+      setGenerateStatus(
+        selectionChanged
+          ? `Selection refreshed. ${selection.length || nextSelectedPhotos.length || 0} reference${(selection.length || nextSelectedPhotos.length || 0) === 1 ? "" : "s"} synced from Gallery.`
+          : "Selection is already up to date."
+      );
+      refreshButton.disabled = false;
+      refreshButton.textContent = originalLabel;
     });
   }
 
