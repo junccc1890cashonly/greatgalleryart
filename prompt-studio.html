@@ -217,6 +217,10 @@
         align-items: center;
         gap: 12px;
       }
+      .analysis-head {
+        margin-bottom: 14px;
+        align-items: start;
+      }
       .field p,
       .field textarea,
       .analysis-card p,
@@ -299,6 +303,7 @@
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
+        margin-top: 0;
       }
       .tag {
         padding: 10px 12px;
@@ -343,6 +348,9 @@
         }
         .selection-grid {
           grid-template-columns: 1fr;
+        }
+        .analysis-head {
+          flex-wrap: wrap;
         }
       }
     </style>
