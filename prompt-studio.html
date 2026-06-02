@@ -343,6 +343,28 @@
         overflow: hidden;
         position: relative;
       }
+      .enhance-frame.is-uploadable {
+        cursor: pointer;
+      }
+      .enhance-frame.is-uploadable::before {
+        content: "Click to Upload";
+        position: absolute;
+        inset: auto 12px 12px 12px;
+        padding: 8px 10px;
+        color: rgba(255, 253, 249, 0.94);
+        background: rgba(29, 26, 23, 0.52);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 160ms ease;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .enhance-frame.is-uploadable:hover::before,
+      .enhance-frame.is-uploadable:focus-within::before {
+        opacity: 1;
+      }
       .enhance-download {
         position: absolute;
         top: 12px;
@@ -392,12 +414,6 @@
         color: var(--muted);
         font-size: 13px;
         line-height: 1.7;
-      }
-      .enhance-source-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
       }
       .visually-hidden {
         position: absolute;
@@ -569,14 +585,11 @@
             <div class="enhance-grid">
               <div class="enhance-stage">
                 <div class="label">Source Image</div>
-                <div class="enhance-frame js-enhance-source-frame">
+                <div class="enhance-frame is-uploadable js-enhance-source-frame" tabindex="0" role="button" aria-label="Upload source image">
                   <div class="enhance-empty">Upload a source image to preview it here before running image enhancement.</div>
                 </div>
                 <div class="enhance-meta js-enhance-source-meta">Upload any image you want to refine with the current Lovart prompt.</div>
-                <div class="enhance-source-controls">
-                  <input class="visually-hidden js-enhance-upload-input" type="file" accept="image/png,image/jpeg,image/webp" />
-                  <button class="ghost-button js-enhance-upload-trigger" type="button">Upload Source Image</button>
-                </div>
+                <input class="visually-hidden js-enhance-upload-input" type="file" accept="image/png,image/jpeg,image/webp" />
               </div>
               <div class="enhance-stage">
                 <div class="label">Enhanced Result</div>

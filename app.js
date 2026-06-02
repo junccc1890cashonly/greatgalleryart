@@ -671,7 +671,6 @@ function setupPromptStudio() {
   const enhanceResultMeta = document.querySelector(".js-enhance-result-meta");
   const enhanceSourceLabel = document.querySelector(".js-enhance-source-label");
   const enhanceUploadInput = document.querySelector(".js-enhance-upload-input");
-  const enhanceUploadTrigger = document.querySelector(".js-enhance-upload-trigger");
   let promptStudioState = buildFallbackState();
   let enhancementSource = null;
 
@@ -759,9 +758,6 @@ function setupPromptStudio() {
       enhanceSourceMeta.textContent = source
         ? `${source.title} is ready as the source image for enhancement.`
         : "Upload any image you want to refine with the current Lovart prompt.";
-    }
-    if (enhanceUploadTrigger) {
-      enhanceUploadTrigger.textContent = source ? "Update Source Image" : "Upload Source Image";
     }
   }
 
@@ -905,16 +901,23 @@ function setupPromptStudio() {
     });
   }
 
-  if (enhanceUploadTrigger && enhanceUploadInput) {
-    enhanceUploadTrigger.addEventListener("click", () => {
+  if (enhanceSourceFrame && enhanceUploadInput) {
+    enhanceSourceFrame.addEventListener("click", () => {
       enhanceUploadInput.click();
+    });
+
+    enhanceSourceFrame.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        enhanceUploadInput.click();
+      }
     });
 
     enhanceUploadInput.addEventListener("change", async (event) => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
-      enhanceUploadTrigger.disabled = true;
+      enhanceSourceFrame.style.pointerEvents = "none";
       setEnhanceStatus("Preparing source image...");
 
       try {
@@ -930,7 +933,7 @@ function setupPromptStudio() {
         console.error("Source image upload failed:", error);
         setEnhanceStatus(error.message || "Could not prepare the source image.");
       } finally {
-        enhanceUploadTrigger.disabled = false;
+        enhanceSourceFrame.style.pointerEvents = "";
         enhanceUploadInput.value = "";
       }
     });
