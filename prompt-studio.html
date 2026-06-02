@@ -343,6 +343,32 @@
         overflow: hidden;
         position: relative;
       }
+      .enhance-download {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        background: rgba(29, 26, 23, 0.58);
+        color: #fffdf9;
+        text-decoration: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease, transform 160ms ease;
+        z-index: 2;
+        backdrop-filter: blur(8px);
+      }
+      .enhance-frame:hover .enhance-download,
+      .enhance-frame:focus-within .enhance-download {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .enhance-download:hover {
+        transform: translateY(-1px);
+      }
       .enhance-frame img {
         display: block;
         width: 100%;
@@ -366,6 +392,23 @@
         color: var(--muted);
         font-size: 13px;
         line-height: 1.7;
+      }
+      .enhance-source-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
       }
       .tag-row {
         display: grid;
@@ -520,29 +563,33 @@
           <section class="analysis-card">
             <div class="analysis-head">
               <div class="label">Image Edit Preview</div>
-              <span class="subtle js-enhance-source-label">First selected reference</span>
+              <span class="subtle js-enhance-source-label">Upload source image</span>
             </div>
-            <p>Use the current Lovart prompt to refine the first selected reference image and generate an enhanced version.</p>
+            <p>Upload a source image, then use the current Lovart prompt to refine it into an enhanced version.</p>
             <div class="enhance-grid">
               <div class="enhance-stage">
                 <div class="label">Source Image</div>
                 <div class="enhance-frame js-enhance-source-frame">
-                  <div class="enhance-empty">Select references in Gallery to preview the first image here.</div>
+                  <div class="enhance-empty">Upload a source image to preview it here before running image enhancement.</div>
                 </div>
-                <div class="enhance-meta js-enhance-source-meta">The first selected image becomes the source for enhancement.</div>
+                <div class="enhance-meta js-enhance-source-meta">Upload any image you want to refine with the current Lovart prompt.</div>
+                <div class="enhance-source-controls">
+                  <input class="visually-hidden js-enhance-upload-input" type="file" accept="image/png,image/jpeg,image/webp" />
+                  <button class="ghost-button js-enhance-upload-trigger" type="button">Upload Source Image</button>
+                </div>
               </div>
               <div class="enhance-stage">
                 <div class="label">Enhanced Result</div>
                 <div class="enhance-frame js-enhance-result-frame">
-                  <div class="enhance-empty">Generate or refine your prompt, then enhance the first selected image to preview the result here.</div>
+                  <div class="enhance-empty">Generate or refine your prompt, then enhance the uploaded source image to preview the result here.</div>
                 </div>
                 <div class="enhance-meta js-enhance-result-meta">The result is generated with OpenAI image editing and stored in Blob for preview.</div>
               </div>
             </div>
             <div class="enhance-actions">
               <div class="enhance-row">
-                <button class="ghost-button js-enhance-image" type="button">Enhance First Selected Image</button>
-                <div class="enhance-status js-enhance-status">Ready to enhance the first selected reference.</div>
+                <button class="ghost-button js-enhance-image" type="button">Enhance Uploaded Source</button>
+                <div class="enhance-status js-enhance-status">Upload a source image, then enhance it with the current prompt.</div>
               </div>
             </div>
           </section>

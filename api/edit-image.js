@@ -27,6 +27,26 @@ async function fetchSourceImageAsBlob(sourceImageUrl) {
   };
 }
 
+function readSourceImageFromDataUrl(sourceImageDataUrl) {
+  const match = String(sourceImageDataUrl || "").match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  if (!match) {
+    throw new Error("The uploaded source image could not be read.");
+  }
+
+  const mimeType = match[1];
+  const base64Payload = match[2];
+  const extension = mimeType.includes("png")
+    ? "png"
+    : mimeType.includes("webp")
+      ? "webp"
+      : "jpg";
+
+  return {
+    blob: new Blob([Buffer.from(base64Payload, "base64")], { type: mimeType }),
+    extension
+  };
+}
+
 function extractImagePayload(data) {
   const first = Array.isArray(data?.data) ? data.data[0] : null;
   if (!first) {
@@ -67,16 +87,19 @@ export default async function handler(request, response) {
   try {
     const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body || {};
     const sourceImageUrl = String(body.sourceImageUrl || "").trim();
+    const sourceImageDataUrl = String(body.sourceImageDataUrl || "").trim();
     const prompt = String(body.prompt || "").trim();
     const title = String(body.title || "galleryart-edit").trim();
 
-    if (!sourceImageUrl || !prompt) {
+    if ((!sourceImageUrl && !sourceImageDataUrl) || !prompt) {
       return response.status(400).json({
-        error: "A source image URL and prompt are required."
+        error: "A source image and prompt are required."
       });
     }
 
-    const { blob, extension } = await fetchSourceImageAsBlob(sourceImageUrl);
+    const { blob, extension } = sourceImageDataUrl
+      ? readSourceImageFromDataUrl(sourceImageDataUrl)
+      : await fetchSourceImageAsBlob(sourceImageUrl);
     const formData = new FormData();
     formData.append("model", imageModel);
     formData.append("prompt", prompt);

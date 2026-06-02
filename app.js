@@ -670,7 +670,10 @@ function setupPromptStudio() {
   const enhanceSourceMeta = document.querySelector(".js-enhance-source-meta");
   const enhanceResultMeta = document.querySelector(".js-enhance-result-meta");
   const enhanceSourceLabel = document.querySelector(".js-enhance-source-label");
+  const enhanceUploadInput = document.querySelector(".js-enhance-upload-input");
+  const enhanceUploadTrigger = document.querySelector(".js-enhance-upload-trigger");
   let promptStudioState = buildFallbackState();
+  let enhancementSource = null;
 
   function normalizeSelection() {
     const validIds = new Set((promptStudioState.photos || []).map((photo) => photo.id));
@@ -741,36 +744,42 @@ function setupPromptStudio() {
         card.style.cursor = "default";
       }
     });
-    renderEnhancementSource(getExplicitSelectedPhotos()[0] || null);
   }
 
-  function renderEnhancementSource(photo) {
+  function renderEnhancementSource(source) {
     if (enhanceSourceLabel) {
-      enhanceSourceLabel.textContent = photo ? photo.title : "First selected reference";
+      enhanceSourceLabel.textContent = source ? source.title : "Upload source image";
     }
     if (enhanceSourceFrame) {
-      enhanceSourceFrame.innerHTML = photo?.image
-        ? `<img src="${getProxiedImageUrl(photo.image)}" alt="${photo.title}" loading="lazy" />`
-        : `<div class="enhance-empty">Select references in Gallery to preview the first image here.</div>`;
+      enhanceSourceFrame.innerHTML = source?.image
+        ? `<img src="${source.image}" alt="${source.title}" loading="lazy" />`
+        : `<div class="enhance-empty">Upload a source image to preview it here before running image enhancement.</div>`;
     }
     if (enhanceSourceMeta) {
-      enhanceSourceMeta.textContent = photo
-        ? `${photo.title} will be used as the source image for enhancement.`
-        : "The first selected image becomes the source for enhancement.";
+      enhanceSourceMeta.textContent = source
+        ? `${source.title} is ready as the source image for enhancement.`
+        : "Upload any image you want to refine with the current Lovart prompt.";
+    }
+    if (enhanceUploadTrigger) {
+      enhanceUploadTrigger.textContent = source ? "Update Source Image" : "Upload Source Image";
     }
   }
 
   function renderEnhancementResult(imageUrl, promptText, revisedPrompt = "") {
     if (!enhanceResultFrame) return;
     if (!imageUrl) {
-      enhanceResultFrame.innerHTML = `<div class="enhance-empty">Generate or refine your prompt, then enhance the first selected image to preview the result here.</div>`;
+      enhanceResultFrame.innerHTML = `<div class="enhance-empty">Generate or refine your prompt, then enhance the uploaded source image to preview the result here.</div>`;
       if (enhanceResultMeta) {
         enhanceResultMeta.textContent = "The result is generated with OpenAI image editing and stored in Blob for preview.";
       }
       return;
     }
 
-    enhanceResultFrame.innerHTML = `<img src="${getProxiedImageUrl(imageUrl)}" alt="Enhanced prompt result" loading="lazy" />`;
+    const proxiedResultUrl = getProxiedImageUrl(imageUrl);
+    enhanceResultFrame.innerHTML = `
+      <a class="enhance-download" href="${proxiedResultUrl}" download="galleryart-enhanced-result.png" aria-label="Download enhanced result" title="Download enhanced result">↓</a>
+      <img src="${proxiedResultUrl}" alt="Enhanced prompt result" loading="lazy" />
+    `;
     if (enhanceResultMeta) {
       enhanceResultMeta.textContent = revisedPrompt
         ? `Enhanced with OpenAI. Revised prompt: ${revisedPrompt}`
@@ -821,8 +830,8 @@ function setupPromptStudio() {
       );
       setEnhanceStatus(
         selection.length
-          ? "Selection updated. The first remaining selected reference is ready for enhancement."
-          : "No explicit selection remains. Choose references in Gallery before enhancing an image."
+          ? "Prompt references updated. Your uploaded source image is kept for enhancement."
+          : "Prompt references were cleared. Upload a source image and generate a prompt when ready."
       );
     });
   });
@@ -896,13 +905,43 @@ function setupPromptStudio() {
     });
   }
 
+  if (enhanceUploadTrigger && enhanceUploadInput) {
+    enhanceUploadTrigger.addEventListener("click", () => {
+      enhanceUploadInput.click();
+    });
+
+    enhanceUploadInput.addEventListener("change", async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      enhanceUploadTrigger.disabled = true;
+      setEnhanceStatus("Preparing source image...");
+
+      try {
+        const dataUrl = await compressImageFile(file);
+        enhancementSource = {
+          title: file.name.replace(/\.[^.]+$/, "") || "Uploaded source image",
+          image: dataUrl,
+          dataUrl
+        };
+        renderEnhancementSource(enhancementSource);
+        setEnhanceStatus("Source image ready. Enhance it with the current prompt when you are ready.");
+      } catch (error) {
+        console.error("Source image upload failed:", error);
+        setEnhanceStatus(error.message || "Could not prepare the source image.");
+      } finally {
+        enhanceUploadTrigger.disabled = false;
+        enhanceUploadInput.value = "";
+      }
+    });
+  }
+
   if (enhanceButton) {
     enhanceButton.addEventListener("click", async () => {
-      const sourcePhoto = getExplicitSelectedPhotos()[0];
       const promptText = String(lovartPromptText?.textContent || "").trim();
 
-      if (!sourcePhoto?.image) {
-        setEnhanceStatus("Select at least one image in Gallery before enhancing.");
+      if (!enhancementSource?.dataUrl) {
+        setEnhanceStatus("Upload a source image before enhancing.");
         return;
       }
 
@@ -912,13 +951,13 @@ function setupPromptStudio() {
       }
 
       enhanceButton.disabled = true;
-      setEnhanceStatus("Enhancing the first selected reference with OpenAI...");
+      setEnhanceStatus("Enhancing the uploaded source image with OpenAI...");
 
       try {
         const result = await postJson("./api/edit-image", {
-          sourceImageUrl: sourcePhoto.image,
+          sourceImageDataUrl: enhancementSource.dataUrl,
           prompt: promptText,
-          title: sourcePhoto.title
+          title: enhancementSource.title
         });
 
         renderEnhancementResult(result.imageUrl, promptText, result.revisedPrompt || "");
@@ -936,11 +975,13 @@ function setupPromptStudio() {
     .then((state) => {
       promptStudioState = state;
       renderSelection();
+      renderEnhancementSource(null);
       renderEnhancementResult("", "");
     })
     .catch((error) => {
       console.error("Could not load prompt studio state:", error);
       renderSelection();
+      renderEnhancementSource(null);
       renderEnhancementResult("", "");
       setGenerateStatus("Using fallback references until gallery data loads.");
     });
