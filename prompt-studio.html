@@ -318,6 +318,9 @@
         grid-template-columns: 1fr 1fr;
         gap: 14px;
       }
+      .enhance-actions {
+        margin-top: 16px;
+      }
       .enhance-stage {
         display: grid;
         gap: 10px;
@@ -514,10 +517,6 @@
               <span class="subtle js-enhance-source-label">First selected reference</span>
             </div>
             <p>Use the current Lovart prompt to refine the first selected reference image and generate an enhanced version.</p>
-            <div class="enhance-row">
-              <button class="ghost-button js-enhance-image" type="button">Enhance First Selected Image</button>
-              <div class="enhance-status js-enhance-status">Ready to enhance the first selected reference.</div>
-            </div>
             <div class="enhance-grid">
               <div class="enhance-stage">
                 <div class="label">Source Image</div>
@@ -532,6 +531,12 @@
                   <div class="enhance-empty">Generate or refine your prompt, then enhance the first selected image to preview the result here.</div>
                 </div>
                 <div class="enhance-meta js-enhance-result-meta">The result is generated with OpenAI image editing and stored in Blob for preview.</div>
+              </div>
+            </div>
+            <div class="enhance-actions">
+              <div class="enhance-row">
+                <button class="ghost-button js-enhance-image" type="button">Enhance First Selected Image</button>
+                <div class="enhance-status js-enhance-status">Ready to enhance the first selected reference.</div>
               </div>
             </div>
           </section>
