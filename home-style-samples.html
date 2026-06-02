@@ -371,8 +371,9 @@
 
       .sample.museum {
         background:
-          linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(246, 239, 229, 0.98));
-        color: #181310;
+          radial-gradient(circle at top left, rgba(223, 233, 239, 0.58), transparent 28%),
+          linear-gradient(180deg, #f6f3ee 0%, #e7e2da 100%);
+        color: #1a1714;
       }
 
       .museum .mark,
@@ -382,8 +383,25 @@
       .museum .prompt-card,
       .museum .feature-card,
       .museum .button {
-        border: 1px solid rgba(24, 19, 16, 0.12);
-        background: rgba(255, 255, 255, 0.44);
+        border: 1px solid rgba(44, 56, 64, 0.16);
+        background: rgba(244, 247, 248, 0.56);
+      }
+
+      .museum .eyebrow,
+      .museum .metric-label,
+      .museum .brand-stack p,
+      .museum .nav span {
+        color: #61717b;
+      }
+
+      .museum .button.primary {
+        background: #25343d;
+        color: #f4f1eb;
+      }
+
+      .museum .button.secondary {
+        background: rgba(244, 247, 248, 0.82);
+        color: #25343d;
       }
 
       .museum .headline {
@@ -404,9 +422,9 @@
 
       .sample.softlux {
         background:
-          radial-gradient(circle at top right, rgba(255, 247, 240, 0.9), transparent 34%),
-          linear-gradient(180deg, #f7f2ec 0%, #eee4d8 100%);
-        color: #1d1712;
+          radial-gradient(circle at top right, rgba(255, 224, 212, 0.82), transparent 34%),
+          linear-gradient(180deg, #f9f1eb 0%, #efd8cf 100%);
+        color: #221814;
       }
 
       .softlux .mark,
@@ -416,8 +434,8 @@
       .softlux .prompt-card,
       .softlux .feature-card,
       .softlux .button {
-        border: 1px solid rgba(29, 23, 18, 0.12);
-        background: rgba(255, 251, 246, 0.5);
+        border: 1px solid rgba(114, 76, 67, 0.14);
+        background: rgba(255, 246, 241, 0.54);
       }
 
       .softlux .headline {
@@ -426,12 +444,30 @@
 
       .softlux .feature-card {
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 247, 240, 0.66));
+          linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 232, 224, 0.66));
+      }
+
+      .softlux .eyebrow,
+      .softlux .metric-label,
+      .softlux .brand-stack p,
+      .softlux .nav span {
+        color: #9a695a;
+      }
+
+      .softlux .button.primary {
+        background: #6e4338;
+        color: #fff6f1;
+      }
+
+      .softlux .button.secondary {
+        background: rgba(255, 247, 243, 0.86);
+        color: #6e4338;
       }
 
       .sample.editorial {
-        background: #f7f2ea;
-        color: #101010;
+        background:
+          linear-gradient(180deg, #f5f0ea 0%, #ece0d5 100%);
+        color: #141210;
       }
 
       .editorial .home {
@@ -461,13 +497,30 @@
       .editorial .prompt-card,
       .editorial .feature-card,
       .editorial .button {
-        border: 1px solid rgba(16, 16, 16, 0.12);
-        background: rgba(255, 255, 255, 0.38);
+        border: 1px solid rgba(78, 33, 35, 0.15);
+        background: rgba(255, 252, 248, 0.42);
       }
 
       .editorial .headline {
         font-size: clamp(50px, 6vw, 92px);
         line-height: 0.92;
+      }
+
+      .editorial .eyebrow,
+      .editorial .metric-label,
+      .editorial .brand-stack p,
+      .editorial .nav span {
+        color: #7b3d45;
+      }
+
+      .editorial .button.primary {
+        background: #5f232c;
+        color: #fff8f3;
+      }
+
+      .editorial .button.secondary {
+        background: rgba(255, 252, 248, 0.84);
+        color: #5f232c;
       }
 
       .editorial .feature-list {
@@ -479,7 +532,7 @@
       }
 
       .sample.brutalist {
-        background: #f0ece4;
+        background: #f3e7cb;
         color: #111111;
       }
 
@@ -492,7 +545,7 @@
       .brutalist .button,
       .brutalist .preview {
         border: 1.5px solid #141414;
-        background: #fbf7f0;
+        background: #fff9ec;
         box-shadow: 8px 8px 0 #1b1b1b;
       }
 
@@ -514,8 +567,9 @@
 
       .sample.gallery {
         background:
-          linear-gradient(180deg, #f8f5ef 0%, #efe6d9 100%);
-        color: #15110d;
+          radial-gradient(circle at top left, rgba(205, 222, 206, 0.5), transparent 26%),
+          linear-gradient(180deg, #f3f2ea 0%, #dfe4d6 100%);
+        color: #162018;
       }
 
       .gallery .mark,
@@ -525,8 +579,25 @@
       .gallery .prompt-card,
       .gallery .button,
       .gallery .feature-card {
-        border: 1px solid rgba(21, 17, 13, 0.12);
-        background: rgba(255, 255, 255, 0.28);
+        border: 1px solid rgba(48, 77, 53, 0.14);
+        background: rgba(245, 248, 241, 0.38);
+      }
+
+      .gallery .eyebrow,
+      .gallery .metric-label,
+      .gallery .brand-stack p,
+      .gallery .nav span {
+        color: #54735a;
+      }
+
+      .gallery .button.primary {
+        background: #294534;
+        color: #eef4ea;
+      }
+
+      .gallery .button.secondary {
+        background: rgba(245, 248, 241, 0.84);
+        color: #294534;
       }
 
       .gallery .hero-row {
@@ -543,8 +614,8 @@
 
       .sample.noir {
         background:
-          radial-gradient(circle at top center, rgba(64, 63, 66, 0.38), transparent 32%),
-          linear-gradient(180deg, #141417 0%, #0c0c0f 100%);
+          radial-gradient(circle at top center, rgba(59, 73, 104, 0.34), transparent 32%),
+          linear-gradient(180deg, #151822 0%, #0a0d15 100%);
         color: #f3efe7;
       }
 
@@ -570,6 +641,12 @@
       .noir .button.primary {
         background: #f3efe7;
         color: #111214;
+      }
+
+      .noir .eyebrow,
+      .noir .metric-label,
+      .noir .brand-stack p {
+        color: rgba(174, 189, 221, 0.82);
       }
 
       .sample.paper {
@@ -606,9 +683,9 @@
 
       .sample.warmtech {
         background:
-          radial-gradient(circle at top right, rgba(255, 225, 189, 0.34), transparent 30%),
-          linear-gradient(180deg, #f7f2eb 0%, #ece7de 100%);
-        color: #121110;
+          radial-gradient(circle at top right, rgba(250, 187, 124, 0.4), transparent 30%),
+          linear-gradient(180deg, #f5efe7 0%, #e8ddd1 100%);
+        color: #171412;
       }
 
       .warmtech .mark,
@@ -618,20 +695,27 @@
       .warmtech .prompt-card,
       .warmtech .button,
       .warmtech .feature-card {
-        border: 1px solid rgba(18, 17, 16, 0.12);
-        background: rgba(255, 255, 255, 0.42);
+        border: 1px solid rgba(143, 88, 46, 0.15);
+        background: rgba(255, 249, 244, 0.42);
         backdrop-filter: blur(12px);
       }
 
       .warmtech .button.primary {
-        background: #161616;
-        color: #f6f1ea;
+        background: #8a4f25;
+        color: #fff8f2;
+      }
+
+      .warmtech .eyebrow,
+      .warmtech .metric-label,
+      .warmtech .brand-stack p,
+      .warmtech .nav span {
+        color: #a86839;
       }
 
       .sample.monospace {
         background:
-          linear-gradient(180deg, #f2efe8 0%, #e8e2d5 100%);
-        color: #121212;
+          linear-gradient(180deg, #edf1ec 0%, #dde4da 100%);
+        color: #101612;
       }
 
       .monospace .home,
@@ -650,8 +734,8 @@
       .monospace .prompt-card,
       .monospace .button,
       .monospace .feature-card {
-        border: 1px solid rgba(18, 18, 18, 0.14);
-        background: rgba(255, 255, 255, 0.38);
+        border: 1px solid rgba(58, 86, 61, 0.14);
+        background: rgba(248, 252, 246, 0.42);
       }
 
       .monospace .headline {
@@ -660,10 +744,28 @@
         line-height: 1;
       }
 
+      .monospace .eyebrow,
+      .monospace .metric-label,
+      .monospace .brand-stack p,
+      .monospace .nav span {
+        color: #4d6e53;
+      }
+
+      .monospace .button.primary {
+        background: #213a29;
+        color: #eef5ee;
+      }
+
+      .monospace .button.secondary {
+        background: rgba(248, 252, 246, 0.84);
+        color: #213a29;
+      }
+
       .sample.scandi {
         background:
-          linear-gradient(180deg, #f7f5ef 0%, #ece7dc 100%);
-        color: #171615;
+          radial-gradient(circle at top left, rgba(211, 223, 214, 0.52), transparent 28%),
+          linear-gradient(180deg, #f2f4ef 0%, #e2e8df 100%);
+        color: #171d19;
       }
 
       .scandi .mark,
@@ -673,8 +775,8 @@
       .scandi .prompt-card,
       .scandi .button,
       .scandi .feature-card {
-        border: 1px solid rgba(23, 22, 21, 0.12);
-        background: rgba(255, 255, 255, 0.48);
+        border: 1px solid rgba(87, 116, 96, 0.12);
+        background: rgba(252, 255, 251, 0.48);
       }
 
       .scandi .headline {
@@ -688,6 +790,23 @@
       .scandi .feature-card::before {
         background:
           radial-gradient(circle at bottom right, rgba(194, 184, 170, 0.22), transparent 42%);
+      }
+
+      .scandi .eyebrow,
+      .scandi .metric-label,
+      .scandi .brand-stack p,
+      .scandi .nav span {
+        color: #64806d;
+      }
+
+      .scandi .button.primary {
+        background: #4b6852;
+        color: #f3f8f2;
+      }
+
+      .scandi .button.secondary {
+        background: rgba(252, 255, 251, 0.84);
+        color: #4b6852;
       }
 
       @media (max-width: 1120px) {
