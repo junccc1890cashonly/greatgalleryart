@@ -659,14 +659,6 @@ function setupPromptStudio() {
       .filter(Boolean);
   }
 
-  function getPreviewPhotos() {
-    const selectedPhotos = getSelectedPhotos();
-    if (selectedPhotos.length) {
-      return selectedPhotos;
-    }
-    return (promptStudioState.photos || []).slice(0, 4);
-  }
-
   function getExplicitSelectedPhotos() {
     normalizeSelection();
     const selectedSet = new Set(selection);
@@ -677,8 +669,7 @@ function setupPromptStudio() {
 
   function renderSelection() {
     const selectedPhotos = getSelectedPhotos();
-    const previewPhotos = getPreviewPhotos();
-    const count = selectedPhotos.length || previewPhotos.length || 4;
+    const count = selectedPhotos.length;
     const selectedCount = selection.length;
     if (countTarget) {
       countTarget.textContent = formatCount(count);
@@ -687,17 +678,17 @@ function setupPromptStudio() {
       helper.textContent =
         selectedCount > 0
           ? `${selectedCount} references were carried over from Gallery selection.`
-          : "No explicit selection is active. The current visual set is shown as a default preview only.";
+          : "No explicit selection is active. Select images in Gallery to build the current prompt set.";
     }
     if (label) {
-      label.textContent = selectedCount > 0 ? "Gallery selection synced" : "Default preview set";
+      label.textContent = selectedCount > 0 ? "Gallery selection synced" : "No active selection";
     }
     cards.forEach((card, index) => {
-      const photo = previewPhotos[index];
-      const active = Boolean(photo && selectedPhotos.some((selectedPhoto) => selectedPhoto.id === photo.id));
+      const photo = selectedPhotos[index];
+      const active = Boolean(photo);
       card.dataset.photoId = active ? photo?.id || "" : "";
       card.classList.toggle("is-active", active);
-      card.classList.toggle("is-muted", !photo || !active);
+      card.classList.toggle("is-muted", !active);
       if (photo?.image) {
         card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
         card.title = active
