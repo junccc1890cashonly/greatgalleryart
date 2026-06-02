@@ -686,10 +686,17 @@ function setupPromptStudio() {
     cards.forEach((card, index) => {
       const photo = selectedPhotos[index];
       const active = Boolean(photo);
+      card.dataset.photoId = photo?.id || "";
       card.classList.toggle("is-active", active);
       card.classList.toggle("is-muted", !active);
       if (photo?.image) {
         card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
+        card.title = active ? "Click to remove this reference from the current selection." : "";
+        card.style.cursor = "pointer";
+      } else {
+        card.style.backgroundImage = "";
+        card.title = "";
+        card.style.cursor = "default";
       }
     });
     renderEnhancementSource(getExplicitSelectedPhotos()[0] || null);
@@ -744,6 +751,37 @@ function setupPromptStudio() {
     button.addEventListener("click", () => {
       target.classList.toggle("is-collapsed");
       updateToggleState(button, target);
+    });
+  });
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const cardPhotoId = card.dataset.photoId || "";
+      if (!cardPhotoId) return;
+
+      if (!selection.length) {
+        selection = getSelectedPhotos()
+          .map((photo) => photo?.id)
+          .filter(Boolean);
+      }
+
+      if (!selection.includes(cardPhotoId)) {
+        return;
+      }
+
+      selection = selection.filter((id) => id !== cardPhotoId);
+      writeSelection(selection);
+      renderSelection();
+      setGenerateStatus(
+        selection.length
+          ? `${selection.length} reference${selection.length === 1 ? "" : "s"} still selected for prompt generation.`
+          : "All references were cleared. Select new images in Gallery or keep the fallback set."
+      );
+      setEnhanceStatus(
+        selection.length
+          ? "Selection updated. The first remaining selected reference is ready for enhancement."
+          : "No explicit selection remains. Choose references in Gallery before enhancing an image."
+      );
     });
   });
 
