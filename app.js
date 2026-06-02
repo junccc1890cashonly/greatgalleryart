@@ -214,7 +214,10 @@ function createUploadedCard(photo, collections) {
     <p>${photo.note || "Uploaded personal reference."}</p>
     <div class="meta">Stored in Blob · Collection ${collectionName}</div>
     <div class="item-tags">${(photo.tags || []).map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
-    <button class="delete-action js-delete-photo" type="button">Delete</button>
+    <div class="gallery-actions">
+      <button class="card-action js-delete-photo" type="button">Delete</button>
+      <button class="card-action primary js-add-to-prompt" type="button">Add to Prompt</button>
+    </div>
   `;
   return card;
 }
@@ -242,6 +245,10 @@ function createGalleryCard(photo, collections, options = {}) {
     <p>${photo.note || "Collected visual reference."}</p>
     <div class="meta">Added ${collectionName}</div>
     <div class="item-tags">${(photo.tags || []).map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
+    <div class="gallery-actions">
+      <button class="card-action js-delete-photo" type="button">Delete</button>
+      <button class="card-action primary js-add-to-prompt" type="button">Add to Prompt</button>
+    </div>
   `;
   return card;
 }
@@ -331,7 +338,10 @@ function setupGallery() {
   function attachSelectionHandler(item) {
     if (item.dataset.boundSelection === "true") return;
     item.dataset.boundSelection = "true";
-    item.addEventListener("click", () => {
+    item.addEventListener("click", (event) => {
+      if (event.target.closest(".gallery-actions") || event.target.closest(".image-link")) {
+        return;
+      }
       const id = item.dataset.photoId;
       if (!id) return;
       selection = selection.includes(id)
@@ -420,6 +430,7 @@ function setupGallery() {
       attachSelectionHandler(card);
 
       const deleteButton = card.querySelector(".js-delete-photo");
+      const addToPromptButton = card.querySelector(".js-add-to-prompt");
       if (deleteButton) {
         deleteButton.addEventListener("click", async (event) => {
           event.stopPropagation();
@@ -437,6 +448,17 @@ function setupGallery() {
             refreshGalleryStatus(error.message || "Photo could not be deleted.");
             deleteButton.disabled = false;
           }
+        });
+      }
+
+      if (addToPromptButton) {
+        addToPromptButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (!selection.includes(photo.id)) {
+            selection = [...selection, photo.id];
+            renderSelection();
+          }
+          refreshGalleryStatus(`${photo.title} added to the current prompt selection.`);
         });
       }
     });
