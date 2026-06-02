@@ -219,6 +219,33 @@ function createUploadedCard(photo, collections) {
   return card;
 }
 
+function createGalleryCard(photo, collections, options = {}) {
+  const { isFallback = false } = options;
+  if (!isFallback) {
+    return createUploadedCard(photo, collections);
+  }
+
+  const card = document.createElement("article");
+  card.className = "gallery-item";
+  card.dataset.photoId = photo.id;
+  card.dataset.tags = (photo.tags || []).join(" ");
+  const collectionName = getCollectionName(collections, photo.collectionId);
+  const imageUrl = String(photo.image || "").trim();
+  const proxiedImageUrl = getProxiedImageUrl(imageUrl);
+  card.innerHTML = `
+    <div class="gallery-cover">
+      ${imageUrl
+        ? `<img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />`
+        : `<div class="image-empty">Image URL missing</div>`}
+    </div>
+    <h4>${photo.title}</h4>
+    <p>${photo.note || "Collected visual reference."}</p>
+    <div class="meta">Added ${collectionName}</div>
+    <div class="item-tags">${(photo.tags || []).map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
+  `;
+  return card;
+}
+
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -258,17 +285,16 @@ async function compressImageFile(file) {
 }
 
 function setupGallery() {
+  const galleryGrid = document.querySelector(".js-gallery-grid");
+  if (!galleryGrid) return;
+
   const items = Array.from(document.querySelectorAll(".gallery-item[data-photo-id]"));
-  if (!items.length) return;
 
   const countTargets = document.querySelectorAll(".js-selected-count");
   const summary = document.querySelector(".js-selection-summary");
   const promptLinks = document.querySelectorAll(".js-open-prompt");
   const filterButtons = document.querySelectorAll("[data-filter]");
   const collectionList = document.querySelector(".js-collection-list");
-  const uploadedGrid = document.querySelector(".js-uploaded-grid");
-  const uploadedSection = document.querySelector(".js-uploaded-section");
-  const uploadedCount = document.querySelector(".js-uploaded-count");
   const uploadModal = document.querySelector(".js-upload-modal");
   const collectionModal = document.querySelector(".js-collection-modal");
   const uploadForm = document.querySelector(".js-upload-form");
@@ -384,47 +410,36 @@ function setupGallery() {
     });
   }
 
-  function renderUploadedVisibility() {
-    if (!uploadedSection || !uploadedCount || !uploadedGrid) return;
-    const count = uploadedGrid.children.length;
-    uploadedSection.classList.toggle("is-visible", count > 0);
-    uploadedCount.textContent = `${count} stored upload${count === 1 ? "" : "s"} in your gallery`;
-  }
-
-  function renderUploadedPhotos() {
-    if (!uploadedGrid) return;
-    uploadedGrid.innerHTML = "";
+  function renderGalleryPhotos() {
+    galleryGrid.innerHTML = "";
     const defaultIds = new Set(DEFAULT_PHOTOS.map((photo) => photo.id));
-    const uploadedPhotos = (remoteState.photos || []).filter((photo) => !defaultIds.has(photo.id));
-    uploadedPhotos
-      .slice()
-      .reverse()
-      .forEach((photo) => {
-        const card = createUploadedCard(photo, remoteState.collections);
-        uploadedGrid.append(card);
-        attachSelectionHandler(card);
-        const deleteButton = card.querySelector(".js-delete-photo");
-        if (deleteButton) {
-          deleteButton.addEventListener("click", async (event) => {
-            event.stopPropagation();
-            deleteButton.disabled = true;
-            try {
-              const result = await deleteJson("./api/photos", { id: photo.id });
-              remoteState = result.state;
-              renderCollectionOptions();
-              renderCollectionList();
-              renderUploadedPhotos();
-              renderSelection();
-              refreshGalleryStatus("Photo removed from your gallery.");
-            } catch (error) {
-              console.error("Delete failed:", error);
-              refreshGalleryStatus(error.message || "Photo could not be deleted.");
-              deleteButton.disabled = false;
-            }
-          });
-        }
-      });
-    renderUploadedVisibility();
+    (remoteState.photos || []).forEach((photo) => {
+      const isFallback = defaultIds.has(photo.id);
+      const card = createGalleryCard(photo, remoteState.collections, { isFallback });
+      galleryGrid.append(card);
+      attachSelectionHandler(card);
+
+      const deleteButton = card.querySelector(".js-delete-photo");
+      if (deleteButton) {
+        deleteButton.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          deleteButton.disabled = true;
+          try {
+            const result = await deleteJson("./api/photos", { id: photo.id });
+            remoteState = result.state;
+            renderCollectionOptions();
+            renderCollectionList();
+            renderGalleryPhotos();
+            renderSelection();
+            refreshGalleryStatus("Photo removed from your gallery.");
+          } catch (error) {
+            console.error("Delete failed:", error);
+            refreshGalleryStatus(error.message || "Photo could not be deleted.");
+            deleteButton.disabled = false;
+          }
+        });
+      }
+    });
   }
 
   async function syncRemoteState(options = {}) {
@@ -432,7 +447,7 @@ function setupGallery() {
       remoteState = await fetchGalleryState();
       renderCollectionOptions();
       renderCollectionList();
-      renderUploadedPhotos();
+      renderGalleryPhotos();
       renderSelection();
       if (options.successMessage) {
         refreshGalleryStatus(options.successMessage);
@@ -505,7 +520,7 @@ function setupGallery() {
         remoteState = result.state;
         renderCollectionOptions();
         renderCollectionList();
-        renderUploadedPhotos();
+        renderGalleryPhotos();
         writeActiveCollection(result.collection.id);
         if (uploadCollection) {
           uploadCollection.value = result.collection.id;
@@ -585,7 +600,7 @@ function setupGallery() {
         status.textContent = "Upload complete.";
         renderCollectionOptions();
         renderCollectionList();
-        renderUploadedPhotos();
+        renderGalleryPhotos();
         renderSelection();
         renderFilter(document.querySelector("[data-filter].active")?.dataset.filter || "all");
         refreshGalleryStatus(`${savedPhotos.length} photo${savedPhotos.length > 1 ? "s" : ""} added to your gallery.`);
@@ -599,7 +614,7 @@ function setupGallery() {
 
   renderCollectionOptions();
   renderCollectionList();
-  renderUploadedPhotos();
+  renderGalleryPhotos();
   renderFilter("all");
   renderSelection();
   syncRemoteState({
