@@ -206,8 +206,9 @@ function createUploadedCard(photo, collections) {
   card.innerHTML = `
     <div class="gallery-cover">
       ${imageUrl
-        ? `<img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />
-           <a class="image-link" href="${proxiedImageUrl}" target="_blank" rel="noreferrer">Open image</a>`
+        ? `<a class="gallery-cover-link" href="${proxiedImageUrl}" target="_blank" rel="noreferrer">
+             <img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />
+           </a>`
         : `<div class="image-empty">Image URL missing</div>`}
     </div>
     <h4>${photo.title}</h4>
@@ -238,7 +239,9 @@ function createGalleryCard(photo, collections, options = {}) {
   card.innerHTML = `
     <div class="gallery-cover">
       ${imageUrl
-        ? `<img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />`
+        ? `<a class="gallery-cover-link" href="${proxiedImageUrl}" target="_blank" rel="noreferrer">
+             <img class="gallery-image" src="${proxiedImageUrl}" alt="${photo.title}" loading="lazy" />
+           </a>`
         : `<div class="image-empty">Image URL missing</div>`}
     </div>
     <h4>${photo.title}</h4>
@@ -338,17 +341,6 @@ function setupGallery() {
   function attachSelectionHandler(item) {
     if (item.dataset.boundSelection === "true") return;
     item.dataset.boundSelection = "true";
-    item.addEventListener("click", (event) => {
-      if (event.target.closest(".gallery-actions") || event.target.closest(".image-link")) {
-        return;
-      }
-      const id = item.dataset.photoId;
-      if (!id) return;
-      selection = selection.includes(id)
-        ? selection.filter((value) => value !== id)
-        : [...selection, id];
-      renderSelection();
-    });
   }
 
   function renderSelection() {
@@ -358,6 +350,10 @@ function setupGallery() {
     allItems.forEach((item) => {
       const isSelected = selection.includes(item.dataset.photoId);
       item.classList.toggle("is-selected", isSelected);
+      const addButton = item.querySelector(".js-add-to-prompt");
+      if (addButton) {
+        addButton.textContent = isSelected ? "Added to Prompt" : "Add to Prompt";
+      }
     });
 
     countTargets.forEach((node) => {
@@ -454,11 +450,17 @@ function setupGallery() {
       if (addToPromptButton) {
         addToPromptButton.addEventListener("click", (event) => {
           event.stopPropagation();
-          if (!selection.includes(photo.id)) {
-            selection = [...selection, photo.id];
-            renderSelection();
-          }
-          refreshGalleryStatus(`${photo.title} added to the current prompt selection.`);
+          const alreadySelected = selection.includes(photo.id);
+          selection = alreadySelected
+            ? selection.filter((id) => id !== photo.id)
+            : [...selection, photo.id];
+          renderSelection();
+          refreshGalleryStatus(
+            alreadySelected
+              ? `${photo.title} removed from the current prompt selection.`
+              : `${photo.title} added to the current prompt selection.`
+          );
+          addToPromptButton.textContent = alreadySelected ? "Add to Prompt" : "Added to Prompt";
         });
       }
     });
