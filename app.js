@@ -653,10 +653,15 @@ function setupPromptStudio() {
     normalizeSelection();
     const selectedSet = new Set(selection);
     const selectedPhotos = (promptStudioState.photos || []).filter((photo) => selectedSet.has(photo.id));
+    return selection
+      .map((id) => selectedPhotos.find((photo) => photo.id === id))
+      .filter(Boolean);
+  }
+
+  function getPreviewPhotos() {
+    const selectedPhotos = getSelectedPhotos();
     if (selectedPhotos.length) {
-      return selection
-        .map((id) => selectedPhotos.find((photo) => photo.id === id))
-        .filter(Boolean);
+      return selectedPhotos;
     }
     return (promptStudioState.photos || []).slice(0, 4);
   }
@@ -671,27 +676,30 @@ function setupPromptStudio() {
 
   function renderSelection() {
     const selectedPhotos = getSelectedPhotos();
-    const count = selectedPhotos.length || 4;
+    const previewPhotos = getPreviewPhotos();
+    const count = selectedPhotos.length || previewPhotos.length || 4;
     const selectedCount = selection.length;
     countTarget.textContent = formatCount(count);
     if (helper) {
       helper.textContent =
         selectedCount > 0
           ? `${selectedCount} references were carried over from Gallery selection.`
-          : "No saved selection found. Using the current visual set as the default prompt references.";
+          : "No explicit selection is active. The current visual set is shown as a default preview only.";
     }
     if (label) {
-      label.textContent = selectedCount > 0 ? "Gallery selection synced" : "Quiet Luxury / Interior Silence";
+      label.textContent = selectedCount > 0 ? "Gallery selection synced" : "Default preview set";
     }
     cards.forEach((card, index) => {
-      const photo = selectedPhotos[index];
-      const active = Boolean(photo);
-      card.dataset.photoId = photo?.id || "";
+      const photo = previewPhotos[index];
+      const active = Boolean(photo && selectedPhotos.some((selectedPhoto) => selectedPhoto.id === photo.id));
+      card.dataset.photoId = active ? photo?.id || "" : "";
       card.classList.toggle("is-active", active);
-      card.classList.toggle("is-muted", !active);
+      card.classList.toggle("is-muted", !photo || !active);
       if (photo?.image) {
         card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
-        card.title = active ? "Click to remove this reference from the current selection." : "";
+        card.title = active
+          ? "Click to remove this reference from the current selection."
+          : "Preview only. Select images in Gallery to make them active references.";
         card.style.cursor = "pointer";
       } else {
         card.style.backgroundImage = "";
