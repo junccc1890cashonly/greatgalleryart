@@ -623,6 +623,13 @@ function setupPromptStudio() {
   const styleSummaryText = document.querySelector(".js-style-summary-text");
   const hashtagBank = document.querySelector(".js-tag-bank");
   const lovartPromptText = document.querySelector(".js-lovart-prompt-text");
+  const enhanceButton = document.querySelector(".js-enhance-image");
+  const enhanceStatus = document.querySelector(".js-enhance-status");
+  const enhanceSourceFrame = document.querySelector(".js-enhance-source-frame");
+  const enhanceResultFrame = document.querySelector(".js-enhance-result-frame");
+  const enhanceSourceMeta = document.querySelector(".js-enhance-source-meta");
+  const enhanceResultMeta = document.querySelector(".js-enhance-result-meta");
+  const enhanceSourceLabel = document.querySelector(".js-enhance-source-label");
   let promptStudioState = buildFallbackState();
 
   function normalizeSelection() {
@@ -636,6 +643,12 @@ function setupPromptStudio() {
     }
   }
 
+  function setEnhanceStatus(message) {
+    if (enhanceStatus) {
+      enhanceStatus.textContent = message;
+    }
+  }
+
   function getSelectedPhotos() {
     normalizeSelection();
     const selectedSet = new Set(selection);
@@ -646,6 +659,14 @@ function setupPromptStudio() {
         .filter(Boolean);
     }
     return (promptStudioState.photos || []).slice(0, 4);
+  }
+
+  function getExplicitSelectedPhotos() {
+    normalizeSelection();
+    const selectedSet = new Set(selection);
+    return selection
+      .map((id) => (promptStudioState.photos || []).find((photo) => selectedSet.has(photo.id) && photo.id === id))
+      .filter(Boolean);
   }
 
   function renderSelection() {
@@ -671,6 +692,41 @@ function setupPromptStudio() {
         card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
       }
     });
+    renderEnhancementSource(getExplicitSelectedPhotos()[0] || null);
+  }
+
+  function renderEnhancementSource(photo) {
+    if (enhanceSourceLabel) {
+      enhanceSourceLabel.textContent = photo ? photo.title : "First selected reference";
+    }
+    if (enhanceSourceFrame) {
+      enhanceSourceFrame.innerHTML = photo?.image
+        ? `<img src="${getProxiedImageUrl(photo.image)}" alt="${photo.title}" loading="lazy" />`
+        : `<div class="enhance-empty">Select references in Gallery to preview the first image here.</div>`;
+    }
+    if (enhanceSourceMeta) {
+      enhanceSourceMeta.textContent = photo
+        ? `${photo.title} will be used as the source image for enhancement.`
+        : "The first selected image becomes the source for enhancement.";
+    }
+  }
+
+  function renderEnhancementResult(imageUrl, promptText, revisedPrompt = "") {
+    if (!enhanceResultFrame) return;
+    if (!imageUrl) {
+      enhanceResultFrame.innerHTML = `<div class="enhance-empty">Generate or refine your prompt, then enhance the first selected image to preview the result here.</div>`;
+      if (enhanceResultMeta) {
+        enhanceResultMeta.textContent = "The result is generated with OpenAI image editing and stored in Blob for preview.";
+      }
+      return;
+    }
+
+    enhanceResultFrame.innerHTML = `<img src="${getProxiedImageUrl(imageUrl)}" alt="Enhanced prompt result" loading="lazy" />`;
+    if (enhanceResultMeta) {
+      enhanceResultMeta.textContent = revisedPrompt
+        ? `Enhanced with OpenAI. Revised prompt: ${revisedPrompt}`
+        : `Enhanced with the current Lovart prompt: ${promptText.slice(0, 120)}${promptText.length > 120 ? "..." : ""}`;
+    }
   }
 
   function updateToggleState(button, target) {
@@ -760,14 +816,52 @@ function setupPromptStudio() {
     });
   }
 
+  if (enhanceButton) {
+    enhanceButton.addEventListener("click", async () => {
+      const sourcePhoto = getExplicitSelectedPhotos()[0];
+      const promptText = String(lovartPromptText?.textContent || "").trim();
+
+      if (!sourcePhoto?.image) {
+        setEnhanceStatus("Select at least one image in Gallery before enhancing.");
+        return;
+      }
+
+      if (!promptText) {
+        setEnhanceStatus("Generate or provide a Lovart prompt before enhancing an image.");
+        return;
+      }
+
+      enhanceButton.disabled = true;
+      setEnhanceStatus("Enhancing the first selected reference with OpenAI...");
+
+      try {
+        const result = await postJson("./api/edit-image", {
+          sourceImageUrl: sourcePhoto.image,
+          prompt: promptText,
+          title: sourcePhoto.title
+        });
+
+        renderEnhancementResult(result.imageUrl, promptText, result.revisedPrompt || "");
+        setEnhanceStatus("Enhanced image ready. Review the side-by-side preview.");
+      } catch (error) {
+        console.error("Image enhancement failed:", error);
+        setEnhanceStatus(error.message || "Image enhancement failed.");
+      } finally {
+        enhanceButton.disabled = false;
+      }
+    });
+  }
+
   fetchGalleryState()
     .then((state) => {
       promptStudioState = state;
       renderSelection();
+      renderEnhancementResult("", "");
     })
     .catch((error) => {
       console.error("Could not load prompt studio state:", error);
       renderSelection();
+      renderEnhancementResult("", "");
       setGenerateStatus("Using fallback references until gallery data loads.");
     });
 }
