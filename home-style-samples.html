@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GalleryArt Home Style Samples</title>
+    <style>
+      :root {
+        --page-bg: #f3efe8;
+        --page-text: #161412;
+        --page-muted: #7d756d;
+        --page-line: rgba(22, 20, 18, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+        color: var(--page-text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 28%),
+          linear-gradient(180deg, #f6f1ea 0%, #efe7dc 100%);
+      }
+
+      .overview {
+        width: min(1440px, calc(100vw - 40px));
+        margin: 22px auto 0;
+        padding: 28px;
+        border: 1px solid var(--page-line);
+        background: rgba(255, 251, 246, 0.72);
+        backdrop-filter: blur(16px);
+      }
+
+      .overview h1 {
+        margin: 0 0 10px;
+        font-size: clamp(34px, 5vw, 62px);
+        font-weight: 400;
+        letter-spacing: -0.03em;
+      }
+
+      .overview p {
+        max-width: 860px;
+        margin: 0;
+        color: var(--page-muted);
+        font-size: 17px;
+        line-height: 1.8;
+      }
+
+      .sample-grid {
+        width: min(1440px, calc(100vw - 40px));
+        margin: 18px auto 40px;
+        display: grid;
+        gap: 22px;
+      }
+
+      .sample {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(22, 20, 18, 0.12);
+        min-height: 760px;
+        padding: 28px;
+      }
+
+      .sample-label {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        z-index: 5;
+        padding: 8px 12px;
+        border: 1px solid currentColor;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        opacity: 0.78;
+      }
+
+      .home {
+        position: relative;
+        z-index: 2;
+        min-height: 700px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 44px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 14px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .brand-stack h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 400;
+      }
+
+      .brand-stack p {
+        margin: 4px 0 0;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0.78;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+      }
+
+      .nav span {
+        opacity: 0.76;
+      }
+
+      .hero {
+        display: grid;
+        gap: 28px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        padding: 8px 12px;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .headline {
+        max-width: 920px;
+        margin: 0;
+        font-size: clamp(44px, 6vw, 86px);
+        font-weight: 400;
+        line-height: 0.96;
+        letter-spacing: -0.045em;
+      }
+
+      .subcopy {
+        max-width: 760px;
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.85;
+        opacity: 0.88;
+      }
+
+      .hero-row {
+        display: grid;
+        grid-template-columns: 1.06fr 0.94fr;
+        gap: 22px;
+        align-items: end;
+      }
+
+      .metric-strip,
+      .preview-grid,
+      .bottom-row {
+        display: grid;
+        gap: 14px;
+      }
+
+      .metric-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .metric,
+      .preview,
+      .note-card,
+      .prompt-card,
+      .mini-panel,
+      .feature-card {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .metric {
+        padding: 16px;
+      }
+
+      .metric-label,
+      .mini-kicker {
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        opacity: 0.72;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 12px;
+        font-size: 34px;
+        font-weight: 400;
+      }
+
+      .preview-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .preview {
+        min-height: 214px;
+        padding: 16px;
+        display: flex;
+        align-items: end;
+      }
+
+      .preview::before,
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .preview span {
+        position: relative;
+        z-index: 1;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .bottom-row {
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+
+      .note-card,
+      .prompt-card,
+      .mini-panel,
+      .feature-card {
+        padding: 20px;
+      }
+
+      .note-card h3,
+      .prompt-card h3,
+      .feature-card h3 {
+        margin: 0 0 12px;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .note-card p,
+      .prompt-card p,
+      .feature-card p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.8;
+        opacity: 0.88;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        min-height: 44px;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .preview-1 {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(18, 18, 18, 0.42)),
+          url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80") center/cover;
+      }
+
+      .preview-2 {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(18, 18, 18, 0.42)),
+          url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80") center/cover;
+      }
+
+      .sample.apple {
+        background:
+          radial-gradient(circle at top center, rgba(255, 255, 255, 0.96), transparent 42%),
+          linear-gradient(180deg, #f4f4f6 0%, #ececf0 100%);
+        color: #0b0b0d;
+      }
+
+      .apple .mark,
+      .apple .eyebrow,
+      .apple .metric,
+      .apple .note-card,
+      .apple .prompt-card,
+      .apple .button,
+      .apple .feature-card {
+        border: 1px solid rgba(15, 15, 18, 0.08);
+        background: rgba(255, 255, 255, 0.62);
+        backdrop-filter: blur(18px);
+      }
+
+      .apple .headline {
+        font-family: "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+        font-size: clamp(48px, 7vw, 96px);
+        font-weight: 600;
+        line-height: 0.94;
+        letter-spacing: -0.07em;
+        max-width: 980px;
+      }
+
+      .apple .brand-stack h2,
+      .apple .subcopy {
+        font-family: "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .apple .subcopy {
+        max-width: 700px;
+        font-size: 20px;
+        color: rgba(11, 11, 13, 0.72);
+      }
+
+      .apple .button.primary {
+        background: #111214;
+        color: #f6f6f8;
+      }
+
+      .apple .button.secondary {
+        background: rgba(255, 255, 255, 0.7);
+        color: #111214;
+      }
+
+      .apple .feature-card::before {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent);
+      }
+
+      .sample.museum {
+        background:
+          linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(246, 239, 229, 0.98));
+        color: #181310;
+      }
+
+      .museum .mark,
+      .museum .eyebrow,
+      .museum .metric,
+      .museum .note-card,
+      .museum .prompt-card,
+      .museum .feature-card,
+      .museum .button {
+        border: 1px solid rgba(24, 19, 16, 0.12);
+        background: rgba(255, 255, 255, 0.44);
+      }
+
+      .museum .headline {
+        max-width: 920px;
+        font-size: clamp(46px, 6vw, 84px);
+      }
+
+      .museum .home::after {
+        content: "";
+        position: absolute;
+        top: 140px;
+        right: 80px;
+        width: 220px;
+        height: 220px;
+        border: 1px solid rgba(24, 19, 16, 0.08);
+        border-radius: 50%;
+      }
+
+      .sample.softlux {
+        background:
+          radial-gradient(circle at top right, rgba(255, 247, 240, 0.9), transparent 34%),
+          linear-gradient(180deg, #f7f2ec 0%, #eee4d8 100%);
+        color: #1d1712;
+      }
+
+      .softlux .mark,
+      .softlux .eyebrow,
+      .softlux .metric,
+      .softlux .note-card,
+      .softlux .prompt-card,
+      .softlux .feature-card,
+      .softlux .button {
+        border: 1px solid rgba(29, 23, 18, 0.12);
+        background: rgba(255, 251, 246, 0.5);
+      }
+
+      .softlux .headline {
+        max-width: 980px;
+      }
+
+      .softlux .feature-card {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 247, 240, 0.66));
+      }
+
+      .sample.editorial {
+        background: #f7f2ea;
+        color: #101010;
+      }
+
+      .editorial .home {
+        display: grid;
+        grid-template-columns: 0.54fr 0.46fr;
+        gap: 28px;
+      }
+
+      .editorial .topbar,
+      .editorial .hero,
+      .editorial .bottom-row,
+      .editorial .feature-list {
+        display: contents;
+      }
+
+      .editorial .left-col,
+      .editorial .right-col {
+        display: grid;
+        align-content: start;
+        gap: 24px;
+      }
+
+      .editorial .mark,
+      .editorial .eyebrow,
+      .editorial .metric,
+      .editorial .note-card,
+      .editorial .prompt-card,
+      .editorial .feature-card,
+      .editorial .button {
+        border: 1px solid rgba(16, 16, 16, 0.12);
+        background: rgba(255, 255, 255, 0.38);
+      }
+
+      .editorial .headline {
+        font-size: clamp(50px, 6vw, 92px);
+        line-height: 0.92;
+      }
+
+      .editorial .feature-list {
+        grid-template-columns: 1fr;
+      }
+
+      .editorial .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .sample.brutalist {
+        background: #f0ece4;
+        color: #111111;
+      }
+
+      .brutalist .mark,
+      .brutalist .eyebrow,
+      .brutalist .metric,
+      .brutalist .note-card,
+      .brutalist .prompt-card,
+      .brutalist .feature-card,
+      .brutalist .button,
+      .brutalist .preview {
+        border: 1.5px solid #141414;
+        background: #fbf7f0;
+        box-shadow: 8px 8px 0 #1b1b1b;
+      }
+
+      .brutalist .headline {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.06em;
+      }
+
+      .brutalist .button.primary {
+        background: #141414;
+        color: #f7f2ea;
+      }
+
+      .brutalist .button.secondary {
+        background: #f7f2ea;
+        color: #141414;
+      }
+
+      .sample.gallery {
+        background:
+          linear-gradient(180deg, #f8f5ef 0%, #efe6d9 100%);
+        color: #15110d;
+      }
+
+      .gallery .mark,
+      .gallery .eyebrow,
+      .gallery .metric,
+      .gallery .note-card,
+      .gallery .prompt-card,
+      .gallery .button,
+      .gallery .feature-card {
+        border: 1px solid rgba(21, 17, 13, 0.12);
+        background: rgba(255, 255, 255, 0.28);
+      }
+
+      .gallery .hero-row {
+        grid-template-columns: 0.9fr 1.1fr;
+      }
+
+      .gallery .preview-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      .gallery .preview:first-child {
+        min-height: 300px;
+      }
+
+      .sample.noir {
+        background:
+          radial-gradient(circle at top center, rgba(64, 63, 66, 0.38), transparent 32%),
+          linear-gradient(180deg, #141417 0%, #0c0c0f 100%);
+        color: #f3efe7;
+      }
+
+      .noir .mark,
+      .noir .eyebrow,
+      .noir .metric,
+      .noir .note-card,
+      .noir .prompt-card,
+      .noir .button,
+      .noir .feature-card {
+        border: 1px solid rgba(243, 239, 231, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .noir .subcopy,
+      .noir .note-card p,
+      .noir .prompt-card p,
+      .noir .feature-card p,
+      .noir .nav span {
+        color: rgba(243, 239, 231, 0.76);
+      }
+
+      .noir .button.primary {
+        background: #f3efe7;
+        color: #111214;
+      }
+
+      .sample.paper {
+        background:
+          linear-gradient(180deg, #fbf8f1 0%, #f2ece2 100%);
+        color: #171412;
+      }
+
+      .paper::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(23, 20, 18, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(23, 20, 18, 0.03) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+      }
+
+      .paper .mark,
+      .paper .eyebrow,
+      .paper .metric,
+      .paper .note-card,
+      .paper .prompt-card,
+      .paper .button,
+      .paper .feature-card {
+        border: 1px solid rgba(23, 20, 18, 0.14);
+        background: rgba(255, 255, 255, 0.52);
+      }
+
+      .paper .headline {
+        max-width: 860px;
+      }
+
+      .sample.warmtech {
+        background:
+          radial-gradient(circle at top right, rgba(255, 225, 189, 0.34), transparent 30%),
+          linear-gradient(180deg, #f7f2eb 0%, #ece7de 100%);
+        color: #121110;
+      }
+
+      .warmtech .mark,
+      .warmtech .eyebrow,
+      .warmtech .metric,
+      .warmtech .note-card,
+      .warmtech .prompt-card,
+      .warmtech .button,
+      .warmtech .feature-card {
+        border: 1px solid rgba(18, 17, 16, 0.12);
+        background: rgba(255, 255, 255, 0.42);
+        backdrop-filter: blur(12px);
+      }
+
+      .warmtech .button.primary {
+        background: #161616;
+        color: #f6f1ea;
+      }
+
+      .sample.monospace {
+        background:
+          linear-gradient(180deg, #f2efe8 0%, #e8e2d5 100%);
+        color: #121212;
+      }
+
+      .monospace .home,
+      .monospace .brand-stack h2,
+      .monospace .headline,
+      .monospace .subcopy,
+      .monospace .note-card p,
+      .monospace .prompt-card p {
+        font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      }
+
+      .monospace .mark,
+      .monospace .eyebrow,
+      .monospace .metric,
+      .monospace .note-card,
+      .monospace .prompt-card,
+      .monospace .button,
+      .monospace .feature-card {
+        border: 1px solid rgba(18, 18, 18, 0.14);
+        background: rgba(255, 255, 255, 0.38);
+      }
+
+      .monospace .headline {
+        font-size: clamp(38px, 5vw, 76px);
+        letter-spacing: -0.06em;
+        line-height: 1;
+      }
+
+      .sample.scandi {
+        background:
+          linear-gradient(180deg, #f7f5ef 0%, #ece7dc 100%);
+        color: #171615;
+      }
+
+      .scandi .mark,
+      .scandi .eyebrow,
+      .scandi .metric,
+      .scandi .note-card,
+      .scandi .prompt-card,
+      .scandi .button,
+      .scandi .feature-card {
+        border: 1px solid rgba(23, 22, 21, 0.12);
+        background: rgba(255, 255, 255, 0.48);
+      }
+
+      .scandi .headline {
+        max-width: 860px;
+      }
+
+      .scandi .feature-card {
+        min-height: 180px;
+      }
+
+      .scandi .feature-card::before {
+        background:
+          radial-gradient(circle at bottom right, rgba(194, 184, 170, 0.22), transparent 42%);
+      }
+
+      @media (max-width: 1120px) {
+        .hero-row,
+        .bottom-row,
+        .feature-list,
+        .metric-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .editorial .home {
+          grid-template-columns: 1fr;
+        }
+
+        .editorial .feature-list,
+        .editorial .metric-strip {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .overview,
+        .sample-grid {
+          width: min(100vw - 20px, 1440px);
+        }
+
+        .overview,
+        .sample {
+          padding: 18px;
+        }
+
+        .topbar {
+          display: grid;
+          gap: 18px;
+        }
+
+        .preview-grid,
+        .tag-row,
+        .hero-row,
+        .bottom-row,
+        .feature-list,
+        .metric-strip {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="overview">
+      <h1>GalleryArt Home Style Studies</h1>
+      <p>
+        A single page with ten homepage directions for GalleryArt. Each sample keeps the same product idea,
+        then pushes the visual language toward a different kind of premium minimalism. One sample leans
+        Apple-like; the rest explore museum, editorial, mono, gallery, warm-tech, and quieter luxury tones.
+      </p>
+    </section>
+
+    <main class="sample-grid">
+      <section class="sample apple">
+        <div class="sample-label">01 Apple-like Calm</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Private Visual Prompt Studio</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>Gallery</span><span>Collections</span><span>Prompt Studio</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Refine Image Collections Into Prompt Intelligence</div>
+            <h1 class="headline">Collect what you love, then turn visual taste into a prompt system.</h1>
+            <p class="subcopy">A quiet workspace for saving references, grouping them by theme, and asking AI to extract a visual direction ready for Lovart.</p>
+            <div class="cta-row">
+              <div class="button primary">Open Gallery</div>
+              <div class="button secondary">View Prompt Flow</div>
+            </div>
+            <div class="hero-row">
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">Saved references</div><strong>128</strong></div>
+                <div class="metric"><div class="metric-label">Prompt sets</div><strong>24</strong></div>
+                <div class="metric"><div class="metric-label">Collections</div><strong>12</strong></div>
+              </div>
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Quiet Portraits</span></div>
+                <div class="preview preview-2"><span>Interior Silence</span></div>
+              </div>
+            </div>
+            <div class="feature-list">
+              <div class="feature-card"><h3>Save By Taste</h3><p>Build a living gallery from the images you keep returning to.</p></div>
+              <div class="feature-card"><h3>Read The Shared Mood</h3><p>Let AI describe what is consistent across your selected references.</p></div>
+              <div class="feature-card"><h3>Ship To Lovart</h3><p>Produce a concise final prompt instead of rewriting direction every time.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample museum">
+        <div class="sample-label">02 Museum Editorial</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Curated Prompt Archive</p>
+              </div>
+            </div>
+            <div class="nav"><span>Index</span><span>Cabinet</span><span>Works</span><span>Prompt</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">A Personal Museum Of Visual Directions</div>
+            <h1 class="headline">Archive references as if they mattered, then generate prompts as if they were a collection note.</h1>
+            <p class="subcopy">This direction is quieter, more exhibition-like, and intentionally sparse. It treats image curation as a serious creative act.</p>
+            <div class="hero-row">
+              <div class="note-card">
+                <h3>Collection Focus</h3>
+                <p>For designers who want image organization to feel slow, intentional, and editorial rather than dashboard-like.</p>
+              </div>
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Soft Light Studies</span></div>
+                <div class="preview preview-2"><span>Mineral Rooms</span></div>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <div class="prompt-card">
+                <h3>Prompt Result</h3>
+                <p>Extract the muted palette, deliberate spacing, and museum-like stillness from selected references, then translate that atmosphere into a usable creative prompt.</p>
+              </div>
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">Curated sets</div><strong>08</strong></div>
+                <div class="metric"><div class="metric-label">Mood notes</div><strong>32</strong></div>
+                <div class="metric"><div class="metric-label">Saved prompts</div><strong>17</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample softlux">
+        <div class="sample-label">03 Soft Luxury</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Quiet Luxury Prompt Engine</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>Looks</span><span>Collections</span><span>Studio</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Understated, Warm, Premium</div>
+            <h1 class="headline">A place to collect references that feel soft, expensive, and impossibly calm.</h1>
+            <p class="subcopy">This version leans into warm stone, pale parchment, and restrained luxury without becoming decorative.</p>
+            <div class="cta-row">
+              <div class="button primary">Start Curating</div>
+              <div class="button secondary">See Example Collections</div>
+            </div>
+            <div class="hero-row">
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Quiet Luxury</span></div>
+                <div class="preview preview-2"><span>Muted Objects</span></div>
+              </div>
+              <div class="prompt-card">
+                <h3>What The Product Does</h3>
+                <p>Upload visual references, group them by atmosphere, and generate a prompt that preserves material softness and premium restraint.</p>
+              </div>
+            </div>
+            <div class="feature-list">
+              <div class="feature-card"><h3>Tag By Mood</h3><p>Keep the language atmospheric instead of overly functional.</p></div>
+              <div class="feature-card"><h3>Summarize Shared Taste</h3><p>Find what repeats across an elegant reference stack.</p></div>
+              <div class="feature-card"><h3>Export Direction</h3><p>Turn taste into a reusable prompt system.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample editorial">
+        <div class="sample-label">04 Magazine Split</div>
+        <div class="home">
+          <div class="left-col">
+            <div class="topbar">
+              <div class="brand">
+                <div class="mark">GA</div>
+                <div class="brand-stack">
+                  <h2>GalleryArt</h2>
+                  <p>Editorial Prompt Reference</p>
+                </div>
+              </div>
+            </div>
+            <div class="eyebrow">Magazine-like Home</div>
+            <h1 class="headline">Collect images. Read the style. Write the prompt.</h1>
+            <p class="subcopy">A more typographic and publishing-oriented direction that feels like the front page of a design issue.</p>
+            <div class="note-card">
+              <h3>Why It Feels Different</h3>
+              <p>The layout gives more visual authority to typography and turns the gallery product into a printed-looking creative workspace.</p>
+            </div>
+            <div class="cta-row">
+              <div class="button primary">Enter The Gallery</div>
+              <div class="button secondary">Browse Collections</div>
+            </div>
+          </div>
+          <div class="right-col">
+            <div class="preview preview-1"><span>Portrait Study</span></div>
+            <div class="metric-strip">
+              <div class="metric"><div class="metric-label">References</div><strong>142</strong></div>
+              <div class="metric"><div class="metric-label">Themes</div><strong>09</strong></div>
+            </div>
+            <div class="preview preview-2"><span>Spatial Note</span></div>
+            <div class="feature-list">
+              <div class="feature-card"><h3>Theme Sets</h3><p>One collection can become the basis for an entire visual issue.</p></div>
+              <div class="feature-card"><h3>AI Notes</h3><p>Describe tone, framing, palette, and material character in one pass.</p></div>
+              <div class="feature-card"><h3>Prompt Ready</h3><p>Rewrite visual thinking as a final tool-ready prompt.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample brutalist">
+        <div class="sample-label">05 Soft Brutalist</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Reference To Prompt Machine</p>
+              </div>
+            </div>
+            <div class="nav"><span>Start</span><span>Images</span><span>Prompts</span><span>Archive</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Sharper Edges, Still Clean</div>
+            <h1 class="headline">If the product had more posture.</h1>
+            <p class="subcopy">A stronger, more assertive direction for when you want the product to feel less delicate and more memorable.</p>
+            <div class="hero-row">
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">Selected</div><strong>04</strong></div>
+                <div class="metric"><div class="metric-label">AI passes</div><strong>31</strong></div>
+                <div class="metric"><div class="metric-label">Kept prompts</div><strong>12</strong></div>
+              </div>
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Hard Framing</span></div>
+                <div class="preview preview-2"><span>Soft Material</span></div>
+              </div>
+            </div>
+            <div class="cta-row">
+              <div class="button primary">Curate Harder</div>
+              <div class="button secondary">Generate Prompt</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample gallery">
+        <div class="sample-label">06 Exhibition Grid</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Image-first Curation System</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>Gallery</span><span>Prompt</span><span>History</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Image-led Homepage</div>
+            <h1 class="headline">A homepage that behaves more like a curated wall than a product landing page.</h1>
+            <p class="subcopy">This direction foregrounds the references and lets the product story emerge from the composition rather than from explanation first.</p>
+            <div class="hero-row">
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Collection One</span></div>
+                <div class="preview preview-2"><span>Collection Two</span></div>
+              </div>
+              <div class="note-card">
+                <h3>Why It Works</h3>
+                <p>The user instantly understands that the product is about curation, not file management.</p>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <div class="prompt-card">
+                <h3>Output Layer</h3>
+                <p>After curation, AI summarizes the style, proposes hashtags, and prepares the final Lovart prompt.</p>
+              </div>
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">Moodboards</div><strong>14</strong></div>
+                <div class="metric"><div class="metric-label">Prompt sets</div><strong>22</strong></div>
+                <div class="metric"><div class="metric-label">Archived</div><strong>18</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample noir">
+        <div class="sample-label">07 Dark Editorial</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Night Mode For Curators</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>References</span><span>Prompt Studio</span><span>Vault</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Monastic Dark</div>
+            <h1 class="headline">A dark, cinematic take that still feels restrained and expensive.</h1>
+            <p class="subcopy">Useful if you want the product to feel more like a private creative vault than a soft lifestyle tool.</p>
+            <div class="cta-row">
+              <div class="button primary">Open Vault</div>
+              <div class="button secondary">Review Prompt Library</div>
+            </div>
+            <div class="hero-row">
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">Private sets</div><strong>19</strong></div>
+                <div class="metric"><div class="metric-label">Prompt runs</div><strong>47</strong></div>
+                <div class="metric"><div class="metric-label">Selected</div><strong>06</strong></div>
+              </div>
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Quiet Noir</span></div>
+                <div class="preview preview-2"><span>Still Interior</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample warmtech">
+        <div class="sample-label">08 Warm Technology</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Refined AI For Visual Direction</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>AI Studio</span><span>Collections</span><span>Prompt Flow</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Technology, But Human</div>
+            <h1 class="headline">Let the product feel smart without looking cold.</h1>
+            <p class="subcopy">This direction introduces a little more product clarity and structure while keeping the warmth of GalleryArt intact.</p>
+            <div class="hero-row">
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">AI summaries</div><strong>53</strong></div>
+                <div class="metric"><div class="metric-label">Prompt exports</div><strong>29</strong></div>
+                <div class="metric"><div class="metric-label">Curated sets</div><strong>11</strong></div>
+              </div>
+              <div class="prompt-card">
+                <h3>Balanced Product Story</h3>
+                <p>Clear enough to understand quickly, but still soft enough to feel premium and image-led.</p>
+              </div>
+            </div>
+            <div class="cta-row">
+              <div class="button primary">Generate Direction</div>
+              <div class="button secondary">Open Examples</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample monospace">
+        <div class="sample-label">09 Mono Quiet</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Systematic Curation For Personal Taste</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>Gallery</span><span>Collections</span><span>Prompts</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Minimal, Structured, Dry</div>
+            <h1 class="headline">A colder, more systematic version of the same product.</h1>
+            <p class="subcopy">If you want the product to feel like a disciplined tool for image thinking, this direction is quieter and more exact.</p>
+            <div class="hero-row">
+              <div class="note-card">
+                <h3>Positioning</h3>
+                <p>Less luxury, more system. Still premium, but almost archival and technical in tone.</p>
+              </div>
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>ref_01</span></div>
+                <div class="preview preview-2"><span>ref_02</span></div>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <div class="prompt-card">
+                <h3>Prompt Translation</h3>
+                <p>Map recurring visual traits into a reusable prompt structure for repeated Lovart runs.</p>
+              </div>
+              <div class="metric-strip">
+                <div class="metric"><div class="metric-label">refs</div><strong>126</strong></div>
+                <div class="metric"><div class="metric-label">sets</div><strong>15</strong></div>
+                <div class="metric"><div class="metric-label">runs</div><strong>34</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sample scandi">
+        <div class="sample-label">10 Scandi Air</div>
+        <div class="home">
+          <div class="topbar">
+            <div class="brand">
+              <div class="mark">GA</div>
+              <div class="brand-stack">
+                <h2>GalleryArt</h2>
+                <p>Lightweight Home With Breathing Room</p>
+              </div>
+            </div>
+            <div class="nav"><span>Home</span><span>Gallery</span><span>Prompt Studio</span><span>Archive</span></div>
+          </div>
+          <div class="hero">
+            <div class="eyebrow">Light, Airy, Balanced</div>
+            <h1 class="headline">Keep everything extremely clean, but warm enough to feel livable.</h1>
+            <p class="subcopy">This version strips the page back while keeping enough tone, texture, and rhythm to avoid feeling generic.</p>
+            <div class="hero-row">
+              <div class="preview-grid">
+                <div class="preview preview-1"><span>Soft Space</span></div>
+                <div class="preview preview-2"><span>Quiet Still</span></div>
+              </div>
+              <div class="note-card">
+                <h3>Closest Mood</h3>
+                <p>Likely the safest choice if you want “high-end, minimal, clean” without becoming too brand-specific.</p>
+              </div>
+            </div>
+            <div class="feature-list">
+              <div class="feature-card"><h3>Upload</h3><p>Bring in the images you keep.</p></div>
+              <div class="feature-card"><h3>Organize</h3><p>Sort by visual theme.</p></div>
+              <div class="feature-card"><h3>Generate</h3><p>Leave with a prompt, not just a board.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
