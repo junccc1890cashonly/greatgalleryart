@@ -728,6 +728,7 @@ function setupPromptStudio() {
       card.dataset.photoId = active ? photo?.id || "" : "";
       card.classList.toggle("is-active", active);
       card.classList.toggle("is-muted", !active);
+      card.classList.toggle("is-empty", !active);
       if (photo?.image) {
         card.style.backgroundImage = `url("${getProxiedImageUrl(photo.image)}")`;
         card.title = active
@@ -735,8 +736,8 @@ function setupPromptStudio() {
           : "Preview only. Select images in Gallery to make them active references.";
         card.style.cursor = "pointer";
       } else {
-        card.style.backgroundImage = "";
-        card.title = "";
+        card.style.backgroundImage = "none";
+        card.title = "Add references from Gallery to build the current prompt set.";
         card.style.cursor = "default";
       }
     });

@@ -173,10 +173,25 @@
       .selection-card {
         aspect-ratio: 0.84;
         border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.32);
         background-size: cover;
         background-position: center;
         position: relative;
         transition: transform 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      }
+      .selection-card.is-empty {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(245, 238, 228, 0.84));
+      }
+      .selection-card.is-empty::before {
+        content: "+";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: rgba(114, 105, 95, 0.44);
+        font-size: 48px;
+        font-weight: 300;
+        line-height: 1;
       }
       .selection-card::after {
         content: "Selected";
@@ -199,12 +214,8 @@
         opacity: 1;
       }
       .selection-card.is-muted {
-        opacity: 0.38;
+        opacity: 1;
       }
-      .ref-1 { background-image: url("https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80"); }
-      .ref-2 { background-image: url("https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"); }
-      .ref-3 { background-image: url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80"); }
-      .ref-4 { background-image: url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80"); }
       .field-stack,
       .analysis-stack {
         display: grid;
@@ -447,10 +458,10 @@
             <span class="subtle js-selection-label">Quiet Luxury / Interior Silence</span>
           </div>
           <div class="selection-grid">
-            <div class="selection-card ref-1" data-ref-index="0"></div>
-            <div class="selection-card ref-2" data-ref-index="1"></div>
-            <div class="selection-card ref-3" data-ref-index="2"></div>
-            <div class="selection-card ref-4" data-ref-index="3"></div>
+            <div class="selection-card is-empty" data-ref-index="0"></div>
+            <div class="selection-card is-empty" data-ref-index="1"></div>
+            <div class="selection-card is-empty" data-ref-index="2"></div>
+            <div class="selection-card is-empty" data-ref-index="3"></div>
           </div>
           <div class="prompt-helper js-selection-helper">Selected references will be carried over from the Gallery page.</div>
           <div class="field-stack" style="margin-top: 18px;">
