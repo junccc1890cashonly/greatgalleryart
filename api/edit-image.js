@@ -82,7 +82,6 @@ export default async function handler(request, response) {
     formData.append("prompt", prompt);
     formData.append("quality", "medium");
     formData.append("size", "1024x1024");
-    formData.append("response_format", "b64_json");
     formData.append("image", blob, `${sanitizeFilename(title)}.${extension}`);
 
     const openaiResponse = await fetch("https://api.openai.com/v1/images/edits", {
