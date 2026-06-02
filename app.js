@@ -608,8 +608,9 @@ function setupGallery() {
 }
 
 function setupPromptStudio() {
+  const promptStudioRoot = document.querySelector(".js-selection-helper") || document.querySelector(".js-generate-prompt");
+  if (!promptStudioRoot) return;
   const countTarget = document.querySelector(".js-selected-count");
-  if (!countTarget) return;
 
   let selection = readSelection();
   const helper = document.querySelector(".js-selection-helper");
@@ -679,7 +680,9 @@ function setupPromptStudio() {
     const previewPhotos = getPreviewPhotos();
     const count = selectedPhotos.length || previewPhotos.length || 4;
     const selectedCount = selection.length;
-    countTarget.textContent = formatCount(count);
+    if (countTarget) {
+      countTarget.textContent = formatCount(count);
+    }
     if (helper) {
       helper.textContent =
         selectedCount > 0
