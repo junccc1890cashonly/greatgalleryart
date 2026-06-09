@@ -250,6 +250,163 @@
         border-top: 1px solid var(--line);
       }
 
+      .daily-engine {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 18px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 249, 242, 0.76));
+      }
+
+      .daily-lead {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+
+      .daily-kicker,
+      .mini-label,
+      .palette-token,
+      .daily-date {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .daily-kicker {
+        color: var(--accent);
+      }
+
+      .daily-head {
+        display: grid;
+        gap: 12px;
+      }
+
+      .daily-head h3 {
+        margin: 0;
+        font-size: clamp(34px, 4.2vw, 56px);
+        font-weight: 400;
+        line-height: 0.98;
+        letter-spacing: -0.03em;
+      }
+
+      .daily-head p,
+      .daily-prompt-copy,
+      .daily-copy {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.85;
+      }
+
+      .daily-facts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .daily-fact {
+        padding: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+
+      .daily-fact strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 20px;
+        font-weight: 400;
+      }
+
+      .daily-prompt-card {
+        padding: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .daily-prompt-card h4 {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--soft);
+      }
+
+      .daily-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .daily-preview {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+
+      .daily-preview-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .daily-preview-card {
+        aspect-ratio: 0.92;
+        border: 1px solid var(--line);
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .daily-preview-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(25, 22, 18, 0.44));
+      }
+
+      .daily-preview-card span {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        z-index: 1;
+        color: #fffdf9;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .daily-rail {
+        display: grid;
+        gap: 12px;
+      }
+
+      .daily-meta-card {
+        padding: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.42);
+      }
+
+      .daily-date {
+        color: var(--soft);
+      }
+
+      .palette-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .palette-token {
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.45);
+        color: var(--muted);
+      }
+
       .section-head {
         display: flex;
         justify-content: space-between;
@@ -466,7 +623,8 @@
       @media (max-width: 1080px) {
         .hero,
         .workspace,
-        .collections {
+        .collections,
+        .daily-engine {
           grid-template-columns: 1fr;
         }
 
@@ -561,6 +719,81 @@
             </p>
           </div>
         </aside>
+      </section>
+
+      <section class="section js-daily-push">
+        <div class="section-head">
+          <h3>Daily Inspiration</h3>
+          <p>
+            Built from the Axesn visual intelligence logic: each day centers one permanent collection,
+            one emotional mood, one color palette, and four reference frames that slow the eye down.
+          </p>
+        </div>
+
+        <div class="daily-engine">
+          <div class="daily-lead">
+            <div class="daily-kicker">Daily Inspiration Engine</div>
+            <div class="daily-head">
+              <div class="daily-date js-daily-date">Today</div>
+              <h3 class="js-daily-title">Blue Silence</h3>
+              <p class="daily-copy js-daily-description">
+                The feeling of a winter morning before the world wakes up.
+              </p>
+            </div>
+
+            <div class="daily-facts">
+              <article class="daily-fact">
+                <div class="mini-label">Mood</div>
+                <strong class="js-daily-mood">Quiet</strong>
+              </article>
+              <article class="daily-fact">
+                <div class="mini-label">Collection</div>
+                <strong class="js-daily-collection">Collection 01</strong>
+              </article>
+            </div>
+
+            <div class="daily-prompt-card">
+              <h4>Daily Prompt</h4>
+              <p class="daily-prompt-copy js-daily-prompt">
+                Find landscapes that create stillness through water, fog, distance, and light.
+              </p>
+            </div>
+
+            <div class="daily-actions">
+              <a class="chip" href="./gallery.html">View Gallery</a>
+              <a class="chip" href="./prompt-studio.html">Build Prompt From Today</a>
+            </div>
+          </div>
+
+          <div class="daily-preview">
+            <div class="daily-preview-grid js-daily-preview-grid">
+              <article class="daily-preview-card" style="background-image:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80');">
+                <span>Reference 01</span>
+              </article>
+              <article class="daily-preview-card" style="background-image:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80');">
+                <span>Reference 02</span>
+              </article>
+              <article class="daily-preview-card" style="background-image:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=80');">
+                <span>Reference 03</span>
+              </article>
+              <article class="daily-preview-card" style="background-image:url('https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=900&q=80');">
+                <span>Reference 04</span>
+              </article>
+            </div>
+
+            <div class="daily-rail">
+              <article class="daily-meta-card">
+                <div class="mini-label">Color Palette</div>
+                <div class="palette-row js-daily-palette">
+                  <span class="palette-token">deep blue</span>
+                  <span class="palette-token">fog grey</span>
+                  <span class="palette-token">soft white</span>
+                  <span class="palette-token">cold silver</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="section">
@@ -669,5 +902,6 @@
         <span>Minimal interface, premium spacing, no interaction yet</span>
       </footer>
     </main>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
