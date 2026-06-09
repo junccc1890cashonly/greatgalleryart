@@ -1,4 +1,4 @@
-import { createCollectionRecord, updateGalleryState } from "../lib/gallery-state.js";
+import { createCollectionRecord, getGalleryState, updateGalleryState } from "../lib/gallery-state.js";
 
 export default async function handler(request, response) {
   if (request.method !== "POST") {
@@ -12,6 +12,15 @@ export default async function handler(request, response) {
 
     if (!name) {
       return response.status(400).json({ error: "Collection name is required." });
+    }
+
+    const existingState = await getGalleryState();
+    const duplicate = (existingState.collections || []).some(
+      (collection) => String(collection.name || "").trim().toLowerCase() === name.toLowerCase()
+    );
+
+    if (duplicate) {
+      return response.status(400).json({ error: "A collection with this name already exists." });
     }
 
     const collection = createCollectionRecord({
