@@ -307,6 +307,10 @@ function setupGallery() {
   const promptLinks = document.querySelectorAll(".js-open-prompt");
   const filterButtons = document.querySelectorAll("[data-filter]");
   const collectionList = document.querySelector(".js-collection-list");
+  const photosStat = document.querySelector(".js-stat-photos");
+  const collectionsStat = document.querySelector(".js-stat-collections");
+  const readyStat = document.querySelector(".js-stat-ready");
+  const currentMood = document.querySelector(".js-current-mood");
   const uploadModal = document.querySelector(".js-upload-modal");
   const collectionModal = document.querySelector(".js-collection-modal");
   const uploadForm = document.querySelector(".js-upload-form");
@@ -345,6 +349,23 @@ function setupGallery() {
     item.dataset.boundSelection = "true";
   }
 
+  function renderHeroStats() {
+    if (photosStat) {
+      photosStat.textContent = formatCount((remoteState.photos || []).length);
+    }
+    if (collectionsStat) {
+      collectionsStat.textContent = formatCount((remoteState.collections || []).length);
+    }
+    if (readyStat) {
+      readyStat.textContent = formatCount(selection.length);
+    }
+    if (currentMood) {
+      const dailyCollection = (remoteState.collections || []).find((collection) => collection.id === "daily-inspiration");
+      const mood = String(dailyCollection?.dailyMood || "").trim();
+      currentMood.textContent = mood ? `Current Mood · ${mood}` : "Current Mood";
+    }
+  }
+
   function renderSelection() {
     normalizeSelection();
     const allItems = Array.from(document.querySelectorAll(".gallery-item[data-photo-id]"));
@@ -380,6 +401,7 @@ function setupGallery() {
     });
 
     writeSelection(selection);
+    renderHeroStats();
   }
 
   function renderFilter(tag) {
@@ -643,6 +665,7 @@ function setupGallery() {
   renderGalleryPhotos();
   renderFilter("all");
   renderSelection();
+  renderHeroStats();
   syncRemoteState({
     failureMessage: "Gallery loaded with local fallback content. Connect Blob storage to persist uploads."
   });
