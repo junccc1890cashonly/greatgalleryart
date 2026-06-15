@@ -1141,37 +1141,61 @@ function setupHomeDailyPush() {
   const dateNode = root.querySelector(".js-daily-date");
   const collectionLink = root.querySelector(".js-open-daily-collection");
 
-  const payload = getDailyInspirationPayload(new Date());
+  function renderDailyPush(payload) {
+    if (titleNode) titleNode.textContent = payload.title;
+    if (descriptionNode) descriptionNode.textContent = payload.description;
+    if (moodNode) moodNode.textContent = payload.mood;
+    if (collectionNode) collectionNode.textContent = "Daily Inspiration";
+    if (promptNode) promptNode.textContent = payload.prompt;
+    if (dateNode) {
+      dateNode.textContent = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(new Date());
+    }
+    if (collectionLink) {
+      collectionLink.href = `./collection.html?collection=${DAILY_INSPIRATION_COLLECTION_ID}`;
+    }
+    if (paletteNode) {
+      paletteNode.innerHTML = payload.palette.map((item) => `<span class="palette-token">${item}</span>`).join("");
+    }
+    if (gridNode) {
+      gridNode.innerHTML = payload.images
+        .map(
+          (image, index) => `
+            <article class="daily-preview-card" style="background-image:url('${getProxiedImageUrl(image)}');">
+              <span>Reference ${String(index + 1).padStart(2, "0")}</span>
+            </article>
+          `
+        )
+        .join("");
+    }
+  }
 
-  if (titleNode) titleNode.textContent = payload.title;
-  if (descriptionNode) descriptionNode.textContent = payload.description;
-  if (moodNode) moodNode.textContent = payload.mood;
-  if (collectionNode) collectionNode.textContent = "Daily Inspiration";
-  if (promptNode) promptNode.textContent = payload.prompt;
-  if (dateNode) {
-    dateNode.textContent = new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    }).format(new Date());
-  }
-  if (collectionLink) {
-    collectionLink.href = `./collection.html?collection=${DAILY_INSPIRATION_COLLECTION_ID}`;
-  }
-  if (paletteNode) {
-    paletteNode.innerHTML = payload.palette.map((item) => `<span class="palette-token">${item}</span>`).join("");
-  }
-  if (gridNode) {
-    gridNode.innerHTML = payload.images
-      .map(
-        (image, index) => `
-          <article class="daily-preview-card" style="background-image:url('${image}');">
-            <span>Reference ${String(index + 1).padStart(2, "0")}</span>
-          </article>
-        `
-      )
-      .join("");
-  }
+  renderDailyPush(getDailyInspirationPayload(new Date()));
+
+  fetchGalleryState()
+    .then((state) => {
+      const dailyCollection = (state.collections || []).find((collection) => collection.id === DAILY_INSPIRATION_COLLECTION_ID);
+      const dailyPhotos = (state.photos || []).filter((photo) => photo.collectionId === DAILY_INSPIRATION_COLLECTION_ID);
+
+      if (!dailyCollection || !dailyPhotos.length) {
+        return;
+      }
+
+      renderDailyPush({
+        title: dailyCollection.dailyTitle || dailyCollection.name,
+        description: dailyCollection.description,
+        mood: dailyCollection.dailyMood || "Quiet",
+        prompt: dailyCollection.dailyPrompt || "",
+        palette: dailyCollection.dailyPalette || [],
+        images: dailyPhotos.map((photo) => photo.image)
+      });
+    })
+    .catch((error) => {
+      console.error("Could not hydrate daily inspiration from gallery state:", error);
+    });
 }
 
 setupHomeDailyPush();
